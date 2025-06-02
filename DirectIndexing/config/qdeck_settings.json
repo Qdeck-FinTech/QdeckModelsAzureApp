@@ -1,0 +1,13 @@
+{
+  "category_weights": {},
+  "direct_index_id": 314,
+  "parameters": {
+    "Compounding": true,
+    "DirectIndexCode": 314,
+    "Initial_Equity": "100000000",
+    "Rebalance": "Monthly",
+    "Start_Date": "2010-01-04"
+  },
+  "symbol_weights": {},
+  "symbols_metadata": {}
+}

@@ -1,0 +1,60 @@
+{
+  "category_weights": {},
+  "external_model_id": "0",
+  "external_model_weights": [],
+  "parameters": {
+    "Fast_Window": "20",
+    "Initial_Equity": "1000000",
+    "Rebalance": "Monthly",
+    "Slow_Window": "50",
+    "Start_Date": "2018-01-29"
+  },
+  "symbol_weights": {},
+  "symbols_metadata": {
+    "VAW": {
+      "country": "US",
+      "id": "92204A80",
+      "ticker": "VAW"
+    },
+    "VCR": {
+      "country": "US",
+      "id": "92204A10",
+      "ticker": "VCR"
+    },
+    "VDC": {
+      "country": "US",
+      "id": "92204A20",
+      "ticker": "VDC"
+    },
+    "VDE": {
+      "country": "US",
+      "id": "92204A30",
+      "ticker": "VDE"
+    },
+    "VFH": {
+      "country": "US",
+      "id": "92204A40",
+      "ticker": "VFH"
+    },
+    "VGT": {
+      "country": "US",
+      "id": "92204A70",
+      "ticker": "VGT"
+    },
+    "VHT": {
+      "country": "US",
+      "id": "92204A50",
+      "ticker": "VHT"
+    },
+    "VIS": {
+      "country": "US",
+      "id": "92204A60",
+      "ticker": "VIS"
+    },
+    "VPU": {
+      "country": "US",
+      "id": "92204A87",
+      "ticker": "VPU"
+    }
+  }
+}

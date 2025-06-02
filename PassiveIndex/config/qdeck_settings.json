@@ -1,0 +1,36 @@
+{
+  "category_weights": {
+    "Equity": "0.6",
+    "Fixed_Income": "0.4"
+  },
+  "external_model_id": "0",
+  "external_model_weights": [],
+  "parameters": {
+    "Compounding": "True",
+    "Initial_Equity": "100000",
+    "Rebalance": "Monthly",
+    "Start_Date": "2015-01-01"
+  },
+  "symbol_weights": {
+    "Equity": {
+      "ACWI": "1.0"
+    },
+    "Fixed_Income": {
+      "AGG": "1.0"
+    }
+  },
+  "symbols_metadata": {
+    "ACWI": {
+      "country": "US",
+      "id": "46428825",
+      "name": "ISHARES TR MSCI ACWI ETF",
+      "ticker": "ACWI"
+    },
+    "AGG": {
+      "country": "US",
+      "id": "46428722",
+      "name": "ISHARES TR CORE US AGGBD ET",
+      "ticker": "AGG"
+    }
+  }
+}

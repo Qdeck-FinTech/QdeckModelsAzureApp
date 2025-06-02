@@ -1,0 +1,50 @@
+{
+  "category_weights": {
+    "Equity": "0.6",
+    "Fixed_Income": "0.4"
+  },
+  "external_model_id": 0,
+  "external_model_weights": [],
+  "parameters": {
+    "Compounding": true,
+    "Initial_Equity": "250000",
+    "Rebalance": "Quarterly",
+    "Start_Date": "2015-01-01"
+  },
+  "symbol_weights": {
+    "Equity": {
+      "AAPL": "0.4",
+      "MSFT": "0.6"
+    },
+    "Fixed_Income": {
+      "AMZN": "0.4",
+      "NVDA": "0.6"
+    }
+  },
+  "symbols_metadata": {
+    "AAPL": {
+      "country": "US",
+      "id": "AAPL",
+      "name": "APPLE",
+      "ticker": "AAPL"
+    },
+    "AMZN": {
+      "country": "US",
+      "id": "AMZN",
+      "name": "AMZN",
+      "ticker": "AMZN"
+    },
+    "MSFT": {
+      "country": "US",
+      "id": "MSFT",
+      "name": "Microsoft",
+      "ticker": "MSFT"
+    },
+    "NVDA": {
+      "country": "US",
+      "id": "NVDA",
+      "name": "NVDA",
+      "ticker": "NVDA"
+    }
+  }
+}

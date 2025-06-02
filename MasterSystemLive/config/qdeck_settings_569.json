@@ -1,0 +1,242 @@
+{
+  "Compounded_pl": true,
+  "Initial_Equity": "100000000",
+  "Portfolio": {
+    "Equity": {
+      "strategies": {
+        "Factor Equity": {
+          "symbols": ["VLUE", "QUAL", "MTUM", "USMV"],
+          "weight": 0.25
+        },
+        "International Equity": {
+          "International_symbol": "ACWI",
+          "US_symbol": "IVV",
+          "default_equity": "True",
+          "fast_window": 40,
+          "slow_window": 100,
+          "symbols": ["IVV", "ACWI"],
+          "weight": 0.25
+        },
+        "Sector Equity": {
+          "approach": "sma",
+          "fast_window": 20,
+          "max_weight": 0.2,
+          "min_weight": 0,
+          "slow_window": 50,
+          "symbols": [
+            "VAW",
+            "VDE",
+            "VFH",
+            "VIS",
+            "VGT",
+            "VDC",
+            "VHT",
+            "VPU",
+            "VCR"
+          ],
+          "trend_vol_adjust": "False",
+          "weight": 0.25
+        },
+        "US Equity": {
+          "symbols": ["IVV", "ONEQ", "IWM"],
+          "weight": 0.25,
+          "weights": {
+            "IVV": 0.5,
+            "IWM": 0.25,
+            "ONEQ": 0.25
+          }
+        }
+      },
+      "weight": 0.4
+    },
+    "Fixed Income": {
+      "strategies": {
+        "Other Fixed Income": {
+          "approach": "trend",
+          "fast_window": 20,
+          "max_weight": 1,
+          "min_weight": 0,
+          "slow_window": 100,
+          "symbols": ["BIL", "TLT"],
+          "trend_vol_adjust": "True",
+          "vol_window": 200,
+          "weight": 0.15
+        },
+        "US Fixed Income": {
+          "approach": "trend",
+          "fast_window": 20,
+          "max_weight": 0.25,
+          "min_weight": 0,
+          "slow_window": 50,
+          "symbols": ["BIL", "IEF", "TLH", "IGSB", "AGG", "IGLB", "MBB", "HYG"],
+          "trend_vol_adjust": "True",
+          "vol_window": 200,
+          "weight": 0.85
+        }
+      },
+      "weight": 0.6
+    }
+  },
+  "Rebalance": "Monthly",
+  "Start_Date": "2015-01-01",
+  "approach": "master",
+  "cash_etf": "BIL",
+  "symbols_metadata": {
+    "ACWI": {
+      "country": "US",
+      "id": "46428825",
+      "name": "ISHARES TR MSCI ACWI ETF",
+      "ticker": "ACWI"
+    },
+    "AGG": {
+      "country": "US",
+      "id": "46428722",
+      "name": "ISHARES TR CORE US AGGBD ET",
+      "ticker": "AGG"
+    },
+    "BIL": {
+      "country": "US",
+      "id": "86330E53",
+      "name": "SPDR SER TR BLOOMBERG 1-3 MO",
+      "ticker": "BIL"
+    },
+    "HYG": {
+      "country": "US",
+      "id": "46428851",
+      "name": "ISHARES TR IBOXX HI YD ETF",
+      "ticker": "HYG"
+    },
+    "IEF": {
+      "country": "US",
+      "id": "46428744",
+      "name": "ISHARES TR 7-10 YR TRSY BD",
+      "ticker": "IEF"
+    },
+    "IGLB": {
+      "country": "US",
+      "id": "46428951",
+      "name": "ISHARES TR 10+ YR INVST GRD",
+      "ticker": "IGLB"
+    },
+    "IGSB": {
+      "country": "US",
+      "id": "46428864",
+      "name": "ISHARES TR ISHS 1-5YR INVS",
+      "ticker": "IGSB"
+    },
+    "IVV": {
+      "country": "US",
+      "id": "46428720",
+      "name": "ISHARES TR CORE S&P500 ETF",
+      "ticker": "IVV"
+    },
+    "IWM": {
+      "country": "US",
+      "id": "IWM",
+      "name": "ISHARES TR RUSSELL 2000 ETF",
+      "ticker": "IWM"
+    },
+    "MBB": {
+      "country": "US",
+      "id": "46428858",
+      "name": "ISHARES TR MBS ETF",
+      "ticker": "MBB"
+    },
+    "MTUM": {
+      "country": "US",
+      "id": "46432F39",
+      "name": "ISHARES TR MSCI USA MMENTM",
+      "ticker": "MTUM"
+    },
+    "ONEQ": {
+      "country": "US",
+      "id": "31591280",
+      "name": "FIDELITY COMWLTH TR NASDAQ COMPSIT",
+      "ticker": "ONEQ"
+    },
+    "QUAL": {
+      "country": "US",
+      "id": "46432F33",
+      "name": "ISHARES TR MSCI USA QLT FCT",
+      "ticker": "QUAL"
+    },
+    "TLH": {
+      "country": "US",
+      "id": "46428865",
+      "name": "ISHARES TR 10-20 YR TRS ETF",
+      "ticker": "TLH"
+    },
+    "TLT": {
+      "country": "US",
+      "id": "46428743",
+      "name": "ISHARES TR 20 YR TR BD ETF",
+      "ticker": "TLT"
+    },
+    "USMV": {
+      "country": "US",
+      "id": "46429B69",
+      "name": "ISHARES TR MSCI USA MIN VOL",
+      "ticker": "USMV"
+    },
+    "VAW": {
+      "country": "US",
+      "id": "92204A80",
+      "name": "VANGUARD WORLD FD MATERIALS ETF",
+      "ticker": "VAW"
+    },
+    "VCR": {
+      "country": "US",
+      "id": "92204A10",
+      "name": "VANGUARD WORLD FD CONSUM DIS ETF",
+      "ticker": "VCR"
+    },
+    "VDC": {
+      "country": "US",
+      "id": "92204A20",
+      "name": "VANGUARD WORLD FD CONSUM STP ETF",
+      "ticker": "VDC"
+    },
+    "VDE": {
+      "country": "US",
+      "id": "92204A30",
+      "name": "VANGUARD WORLD FD ENERGY ETF",
+      "ticker": "VDE"
+    },
+    "VFH": {
+      "country": "US",
+      "id": "92204A40",
+      "name": "VANGUARD WORLD FD FINANCIALS ETF",
+      "ticker": "VFH"
+    },
+    "VGT": {
+      "country": "US",
+      "id": "92204A70",
+      "name": "VANGUARD WORLD FD INF TECH ETF",
+      "ticker": "VGT"
+    },
+    "VHT": {
+      "country": "US",
+      "id": "92204A50",
+      "name": "VANGUARD WORLD FD HEALTH CAR ETF",
+      "ticker": "VHT"
+    },
+    "VIS": {
+      "country": "US",
+      "id": "92204A60",
+      "name": "VANGUARD WORLD FD INDUSTRIAL ETF",
+      "ticker": "VIS"
+    },
+    "VLUE": {
+      "country": "US",
+      "id": "46432F38",
+      "name": "ISHARES TR MSCI USA VALUE",
+      "ticker": "VLUE"
+    },
+    "VPU": {
+      "country": "US",
+      "id": "92204A87",
+      "name": "VANGUARD WORLD FD UTILITIES ETF",
+      "ticker": "VPU"
+    }
+  }
+}

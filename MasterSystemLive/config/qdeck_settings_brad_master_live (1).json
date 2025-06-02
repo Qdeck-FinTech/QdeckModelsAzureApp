@@ -1,0 +1,52 @@
+{
+  "Compounded_pl": true,
+  "Initial_Equity": "100000000",
+  "Portfolio": {
+    "Equity": {
+      "strategies": {
+        "Factor Equity": {
+          "symbols": ["VLUE", "QUAL", "MTUM", "USMV"],
+          "weight": 0.25
+        },
+        "International Equity": {
+          "symbols": ["IVV", "ACWI"],
+          "weight": 0.25
+        },
+        "Sector Equity": {
+          "symbols": [
+            "VAW",
+            "VDE",
+            "VFH",
+            "VIS",
+            "VGT",
+            "VDC",
+            "VHT",
+            "VPU",
+            "VCR"
+          ],
+          "weight": 0.25
+        },
+        "US Equity": {
+          "symbols": ["IVV", "ONEQ", "IWM"],
+          "weight": 0.25
+        }
+      },
+      "weight": 0.6
+    },
+    "Fixed Income": {
+      "strategies": {
+        "Other Fixed Income": {
+          "symbols": ["BIL", "TLT"],
+          "weight": 0.15
+        },
+        "US Fixed Income": {
+          "symbols": ["BIL", "IEF", "TLH", "IGSB", "AGG", "IGLB", "MBB", "HYG"],
+          "weight": 0.85
+        }
+      },
+      "weight": 0.4
+    }
+  },
+  "Rebalance": "Monthly",
+  "Start_Date": "2015-01-01"
+}

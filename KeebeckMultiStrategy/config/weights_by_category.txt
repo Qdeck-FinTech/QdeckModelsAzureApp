@@ -1,0 +1,9 @@
+Asset Class				Proxy		Aggressive Growth	Growth		Moderate Growth		Moderate	Conservative Growth		Conservative	Capital Preservation
+Large-Cap Core			VOO			69.20%				59.50%		50.50%				41.60%		31.90%					22.90%			14.40%
+Small-Cap Core			IJR			3.30%				2.90%		2.40%				2.00%		1.50%					1.10%			0.00%
+Int'l Developed Mkts	IEFA		18.60%				16.00%		13.60%				11.10%		8.50%					6.10%			3.80%
+Int'l Emerging Mkts		IEMG		8.90%				7.60%		6.50%				5.30%		4.10%					2.90%			1.80%
+Intermediate Bond		AGG			0.00%				8.30%		16.10%				23.70%		32.00%					39.80%			47.50%
+International Bond		BNDX		0.00%				3.20%		6.10%				9.10%		12.30%					15.20%			18.20%
+Short Bond				BSV			0.00%				2.50%		4.80%				7.20%		9.70%					12.00%			14.30%
+								

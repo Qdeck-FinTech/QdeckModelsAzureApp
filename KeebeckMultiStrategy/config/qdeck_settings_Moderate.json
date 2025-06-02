@@ -1,0 +1,97 @@
+{
+  "Compounded_pl": true,
+  "Initial_Equity": "100000000",
+  "Portfolio": {
+    "Strategies": {
+      "Intermediate Bond": {
+        "symbols": ["AGG"],
+        "weights": {
+          "AGG": 0.237
+        }
+      },
+      "International Bond": {
+        "symbols": ["BNDX"],
+        "weights": {
+          "BNDX": 0.091
+        }
+      },
+      "International Developed Markets": {
+        "symbols": ["IEFA"],
+        "weights": {
+          "IEFA": 0.111
+        }
+      },
+      "International Emerging Markets": {
+        "symbols": ["IEMG"],
+        "weights": {
+          "IEMG": 0.053
+        }
+      },
+      "Large-Cap Core": {
+        "symbols": ["VOO"],
+        "weights": {
+          "VOO": 0.416
+        }
+      },
+      "Short Bond": {
+        "symbols": ["BSV"],
+        "weights": {
+          "BSV": 0.072
+        }
+      },
+      "Small-Cap Core": {
+        "symbols": ["IJR"],
+        "weights": {
+          "IJR": 0.02
+        }
+      }
+    }
+  },
+  "Rebalance": "Monthly",
+  "Start_Date": "2015-01-01",
+  "approach": "Keebeck",
+  "symbols_metadata": {
+    "AGG": {
+      "country": "US",
+      "id": "46428722",
+      "name": "ISHARES TR CORE US AGGBD ET",
+      "ticker": "AGG"
+    },
+    "BNDX": {
+      "country": "US",
+      "id": "92203J40",
+      "name": "VANGUARD CHARLOTTE FDS TOTAL INT BD ETF",
+      "ticker": "BNDX"
+    },
+    "BSV": {
+      "country": "US",
+      "id": "92193782",
+      "name": "VANGUARD BD INDEX FDS SHORT TRM BOND",
+      "ticker": "BSV"
+    },
+    "IEFA": {
+      "country": "US",
+      "id": "46432F84",
+      "name": "ISHARES TR CORE MSCI EAFE",
+      "ticker": "IEFA"
+    },
+    "IEMG": {
+      "country": "US",
+      "id": "46434G10",
+      "name": "ISHARES INC CORE MSCI EMKT",
+      "ticker": "IEMG"
+    },
+    "IJR": {
+      "country": "US",
+      "id": "IJR",
+      "name": "ISHARES TR CORE S&P SCP ETF",
+      "ticker": "IJR"
+    },
+    "VOO": {
+      "country": "US",
+      "id": "92290841",
+      "name": "VANGUARD INDEX FDS S&P 500 ETF SHS",
+      "ticker": "VOO"
+    }
+  }
+}
