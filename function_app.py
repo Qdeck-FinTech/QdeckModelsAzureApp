@@ -15,7 +15,7 @@ load("coreclr")
 
 # add the path to the Mercury bin directory
 root_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-bin_dir = os.path.join(root_dir, "bin")
+bin_dir = os.path.join(root_dir, "mercury")
 sys.path.insert(0, bin_dir)
 
 clr.AddReference("Mercury")
