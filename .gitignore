@@ -138,3 +138,5 @@ mercury/logs/
 mercury/output/
 
 AzuriteConfig
+
+.DS_Store
