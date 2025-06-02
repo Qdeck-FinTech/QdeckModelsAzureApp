@@ -8,9 +8,6 @@ ENV LANG=C.UTF-8
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true
 
-ENV AzureWebJobsStorage="UseDevelopmentStorage=true"
-ENV FUNCTIONS_WORKER_RUNTIME="python"
-
 # Environment variable for .NET
 ENV DOTNET_ROOT=/usr/share/dotnet
 
@@ -29,13 +26,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y \
-    libkrb5-dev \
-    libssl-dev \
-    libpam0g-dev \
-    libcurl4-openssl-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 # Confirm .NET installation
 RUN dotnet --info
 
@@ -49,8 +39,8 @@ COPY PassiveIndex/ ./PassiveIndex/
 COPY KeebeckMultiStrategy/ ./KeebeckMultiStrategy/ 
 COPY DirectIndexing/ ./DirectIndexing/ 
 
-# Copy bin and utils directories
-COPY bin/ ./bin/
+# Copy mercury and utils directories
+COPY mercury/ ./mercury/
 COPY utils/ ./utils/
 COPY .dockerignore ./
 
