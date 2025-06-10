@@ -4,43 +4,57 @@
   "Portfolio": {
     "Strategies": {
       "Intermediate Bond": {
-        "symbols": ["AGG"],
+        "symbols": [
+          "AGG"
+        ],
         "weights": {
           "AGG": 0.398
         }
       },
       "International Bond": {
-        "symbols": ["BNDX"],
+        "symbols": [
+          "BNDX"
+        ],
         "weights": {
           "BNDX": 0.152
         }
       },
       "International Developed Markets": {
-        "symbols": ["IEFA"],
+        "symbols": [
+          "IEFA"
+        ],
         "weights": {
           "IEFA": 0.061
         }
       },
       "International Emerging Markets": {
-        "symbols": ["IEMG"],
+        "symbols": [
+          "IEMG"
+        ],
         "weights": {
           "IEMG": 0.029
         }
       },
       "Large-Cap Core": {
-        "symbols": ["VOO"],
+        "symbols": [
+          "VOO"
+        ],
         "weights": {
           "VOO": 0.229
         }
       },
       "Short Bond": {
-        "symbols": ["BSV"],
+        "symbols": [
+          "BSV"
+        ],
         "weights": {
           "BSV": 0.12
         }
       },
       "Small-Cap Core": {
-        "symbols": ["IJR"],
+        "symbols": [
+          "IJR"
+        ],
         "weights": {
           "IJR": 0.011
         }
@@ -50,48 +64,48 @@
   "Rebalance": "Monthly",
   "Start_Date": "2015-01-01",
   "approach": "Keebeck",
-  "symbols_metadata": {
-    "AGG": {
+  "symbols": [
+    {
       "country": "US",
       "id": "46428722",
       "name": "ISHARES TR CORE US AGGBD ET",
       "ticker": "AGG"
     },
-    "BNDX": {
+    {
       "country": "US",
       "id": "92203J40",
       "name": "VANGUARD CHARLOTTE FDS TOTAL INT BD ETF",
       "ticker": "BNDX"
     },
-    "BSV": {
+    {
       "country": "US",
       "id": "92193782",
       "name": "VANGUARD BD INDEX FDS SHORT TRM BOND",
       "ticker": "BSV"
     },
-    "IEFA": {
+    {
       "country": "US",
       "id": "46432F84",
       "name": "ISHARES TR CORE MSCI EAFE",
       "ticker": "IEFA"
     },
-    "IEMG": {
+    {
       "country": "US",
       "id": "46434G10",
       "name": "ISHARES INC CORE MSCI EMKT",
       "ticker": "IEMG"
     },
-    "IJR": {
+    {
       "country": "US",
       "id": "IJR",
       "name": "ISHARES TR CORE S&P SCP ETF",
       "ticker": "IJR"
     },
-    "VOO": {
+    {
       "country": "US",
       "id": "92290841",
       "name": "VANGUARD INDEX FDS S&P 500 ETF SHS",
       "ticker": "VOO"
     }
-  }
+  ]
 }

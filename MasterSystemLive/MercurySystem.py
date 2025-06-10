@@ -11,7 +11,17 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, PriceField  # type: ignore
+from System.Collections.Generic import List  # type: ignore
+
+clr.AddReference("Mercury")
+from Mercury import (
+    MercuryRunner,
+    MercuryRunConfig,
+    IMercurySystem,
+    PriceField,
+    TickerInfo,
+)  # type: ignore
+
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -129,6 +139,7 @@ class MasterSystemLive(IMercurySystem):
 
         symbols_inc_cash = [sy for sy in cfg_strategy_section["symbols"]]
         symbols = [sy for sy in symbols_inc_cash if sy != self.cfg.cash_etf]
+        tickers = [s for s in self.symbols if s.ticker in symbols]
 
         def vol(prices, window):
             returns = np.log(prices[:window]) - np.log(prices[1 : (window + 1)])
@@ -157,7 +168,9 @@ class MasterSystemLive(IMercurySystem):
             sy_trend_d = {}
             vol_d = {}
 
-            for sy in symbols:
+            for ticker in tickers:
+                sy = ticker.ToString()
+
                 close = self.close[sy]
 
                 if len(close) <= vol_window:
@@ -188,8 +201,11 @@ class MasterSystemLive(IMercurySystem):
             total_weighted_trend = sum(sy_adj_trend_d.values())
 
             total_weight_ex_cash = 0
+            raw_weight = 0
 
-            for sy in symbols:
+            for ticker in tickers:
+                sy = ticker.ToString()
+
                 if close_less_window:
                     weight = 1 / len(symbols)
 
@@ -218,14 +234,20 @@ class MasterSystemLive(IMercurySystem):
 
             cash_weight = 1 - total_weight_ex_cash
             cash_weight = np.clip(cash_weight, 0, 1)
+
+            cash_etf_ticker = [
+                s for s in self.symbols if s.ticker == self.cfg.cash_etf
+            ][0]
+            cash_etf_symbol = cash_etf_ticker.ToString()
+
             self.cfg.strategy_symbol_weights["Fixed Income"]["strategies"][
                 "US Fixed Income"
-            ]["symbol weights"][self.cfg.cash_etf] = cash_weight
+            ]["symbol weights"][cash_etf_symbol] = cash_weight
 
             if self.cfg.save_outputs:
                 self.US_fixed_income_weights.append(
                     {
-                        "symbol": self.cfg.cash_etf,
+                        "symbol": cash_etf_symbol,
                         "date": self.current_date.ToString(),
                         "weight": cash_weight,
                     }
@@ -238,6 +260,7 @@ class MasterSystemLive(IMercurySystem):
 
         symbols_inc_cash = [sy for sy in cfg_strategy_section["symbols"]]
         symbols = [sy for sy in symbols_inc_cash if sy not in [self.cfg.cash_etf]]
+        tickers = [s for s in self.symbols if s.ticker in symbols]
 
         def f_sma(prices, window):
             return np.mean(prices[:window], axis=0)
@@ -260,9 +283,9 @@ class MasterSystemLive(IMercurySystem):
         sy_trend_d = {}
         vol_d = {}
 
-        total_trend_exist = 0
+        for ticker in tickers:
+            sy = ticker.ToString()
 
-        for sy in symbols:
             close = self.close[sy]
 
             if len(close) <= vol_window:
@@ -289,8 +312,11 @@ class MasterSystemLive(IMercurySystem):
 
         total_weighted_trend = sum(sy_adj_trend_d.values())
         total_weight_ex_cash = 0
+        raw_weight = 0
 
-        for sy in symbols:
+        for ticker in tickers:
+            sy = ticker.ToString()
+
             if close_less_window:
                 weight = 1 / len(symbols)
 
@@ -319,14 +345,18 @@ class MasterSystemLive(IMercurySystem):
 
         cash_weight = 1 - total_weight_ex_cash
         cash_weight = np.clip(cash_weight, 0, 1)
+
+        cash_etf_ticker = [s for s in self.symbols if s.ticker == self.cfg.cash_etf][0]
+        cash_etf_symbol = cash_etf_ticker.ToString()
+
         self.cfg.strategy_symbol_weights["Fixed Income"]["strategies"][
             "Other Fixed Income"
-        ]["symbol weights"][self.cfg.cash_etf] = cash_weight
+        ]["symbol weights"][cash_etf_symbol] = cash_weight
 
         if self.cfg.save_outputs:
             self.other_fixed_income_weights.append(
                 {
-                    "symbol": self.cfg.cash_etf,
+                    "symbol": cash_etf_symbol,
                     "date": self.current_date.ToString(),
                     "weight": cash_weight,
                 }
@@ -335,11 +365,21 @@ class MasterSystemLive(IMercurySystem):
     def US_Equity_calculation(self):
         # symbols = [sy for sy in self.cfg.portfolio['Equity']['strategies']['US Equity']['symbols']]
 
-        weights = self.cfg.portfolio["Equity"]["strategies"]["US Equity"][
+        cfg_strategy_section = self.cfg.portfolio["Equity"]["strategies"]["US Equity"]
+
+        symbols_inc_cash = [sy for sy in cfg_strategy_section["symbols"]]
+        symbols = [sy for sy in symbols_inc_cash if sy != self.cfg.cash_etf]
+        tickers = [s for s in self.symbols if s.ticker in symbols]
+
+        weights = cfg_strategy_section[
             "weights"
         ]  # {'IVV_E':0.50, 'ONEQ_E':0.25, 'IWM_E':0.25}  # Fixed weights
 
-        for sy, weight in weights.items():
+        for ticker in tickers:
+            sy = ticker.ToString()
+
+            weight = weights.get(ticker.ticker, 0)
+
             self.cfg.strategy_symbol_weights["Equity"]["strategies"]["US Equity"][
                 "symbol weights"
             ][sy] = weight
@@ -359,6 +399,7 @@ class MasterSystemLive(IMercurySystem):
         ]
 
         symbols = [sy for sy in cfg_strategy_section["symbols"]]
+        tickers = [s for s in self.symbols if s.ticker in symbols]
 
         def f_sma(prices, window):
             return np.mean(prices[:window], axis=0)
@@ -372,7 +413,10 @@ class MasterSystemLive(IMercurySystem):
         sma_approach = cfg_strategy_section["approach"] == "sma"
 
         sy_trend_d = {}
-        for sy in symbols:
+        trend_exist = 0.5
+
+        for ticker in tickers:
+            sy = ticker.ToString()
             close = self.close[sy]
 
             if sma_approach:
@@ -385,7 +429,9 @@ class MasterSystemLive(IMercurySystem):
 
         n_trends = sum(sy_trend_d.values())
 
-        for sy in symbols:
+        for ticker in tickers:
+            sy = ticker.ToString()
+
             raw_weight = sy_trend_d[sy] / n_trends if n_trends > 0 else 0
             weight = np.clip(raw_weight, min_weight, max_weight)
 
@@ -412,11 +458,21 @@ class MasterSystemLive(IMercurySystem):
         ]
 
         symbols = [sy for sy in cfg_strategy_section["symbols"]]
+        tickers = [s for s in self.symbols if s.ticker in symbols]
 
         US_symbol = cfg_strategy_section[
             "US_symbol"
         ]  # [sy for sy in symbols if sy!='ACWI_E'][0]
         International_symbol = cfg_strategy_section["International_symbol"]
+
+        # find ticker for US and International symbols
+        US_ticker = [s for s in tickers if s.ticker == US_symbol][0]
+        International_ticker = [s for s in tickers if s.ticker == International_symbol][
+            0
+        ]
+
+        US_symbol = US_ticker.ToString()
+        International_symbol = International_ticker.ToString()
 
         def f_sma(prices, window):
             return np.mean(prices[:window], axis=0)
@@ -432,7 +488,9 @@ class MasterSystemLive(IMercurySystem):
         sy_position_d[US_symbol] = 1
         sy_position_d[International_symbol] = 0
 
-        for sy in symbols:
+        for ticker in tickers:
+            sy = ticker.ToString()
+
             close = self.close[sy]
 
             sma_short = f_sma(close, fast_window)
@@ -450,7 +508,9 @@ class MasterSystemLive(IMercurySystem):
                 sy_position_d[US_symbol] = 0
                 sy_position_d[International_symbol] = 1
 
-        for sy in symbols:
+        for ticker in tickers:
+            sy = ticker.ToString()
+
             weight = sy_position_d[sy]
 
             self.cfg.strategy_symbol_weights["Equity"]["strategies"][
@@ -475,8 +535,11 @@ class MasterSystemLive(IMercurySystem):
                 "symbols"
             ]
         ]
+        tickers = [s for s in self.symbols if s.ticker in symbols]
 
-        for sy in symbols:
+        for ticker in tickers:
+            sy = ticker.ToString()
+
             weight = 1 / len(symbols)
             self.cfg.strategy_symbol_weights["Equity"]["strategies"]["Factor Equity"][
                 "symbol weights"
@@ -505,7 +568,7 @@ class MasterSystemLive(IMercurySystem):
         ### NEW
         ### Allows the repeating of symbols in the portfolio
 
-        self.symbol_weights_d_2 = {sy: 0 for sy in self.cfg.symbols}
+        self.symbol_weights_d_2 = {sy.ToString(): 0 for sy in self.symbols}
 
         for sector, sector_data in self.cfg.strategy_symbol_weights.items():
             sector_weight = sector_data["weight"]
@@ -556,7 +619,9 @@ class MasterSystemLive(IMercurySystem):
             self.compute_weights()
 
             for symbol, weight in self.symbol_weights_d_2.items():
-                self.contextHolder.oms.add_weight_order(self.name, symbol, weight)
+                self.contextHolder.oms.add_weight_order(
+                    self.name, TickerInfo.Deserealize(symbol), weight
+                )
 
             self.rebalance = False
 
@@ -640,6 +705,10 @@ class MasterConfig(MercuryRunConfig):
             for sector, sector_data in portfolio.items():
                 for strategy, strategy_data in sector_data["strategies"].items():
                     strategy_symbols = list(strategy_data["symbols"])
+                    strategy_ticker_symbols = [
+                        s for s in cfg["symbols"] if s["ticker"] in strategy_symbols
+                    ]
+                    strategy_tickers = self.get_tickers(strategy_ticker_symbols)
 
                     if cfg["approach"] == "master":
                         default_weight = (
@@ -652,11 +721,13 @@ class MasterConfig(MercuryRunConfig):
 
                     self.strategy_symbol_weights[sector]["strategies"][strategy][
                         "symbol weights"
-                    ] = {sy: default_weight for sy in strategy_symbols}
+                    ] = {sy.ToString(): default_weight for sy in strategy_tickers}
 
                     symbols_list += strategy_symbols
 
-            self.symbols = list(set(symbols_list))  # Get unique symbols
+            # Filter symbols by matching 'id' in symbols_ids
+            tickers = [s for s in cfg["symbols"] if s["ticker"] in symbols_list]
+            self.symbols = self.get_tickers(tickers)
 
             self.rebalance = cfg["Rebalance"]
             if self.rebalance == "Monthly":
@@ -693,6 +764,10 @@ class MasterConfig(MercuryRunConfig):
         for sector, sector_data in portfolio.items():
             for strategy, strategy_data in sector_data["strategies"].items():
                 strategy_symbols = list(strategy_data["symbols"])
+                strategy_ticker_symbols = [
+                    s for s in inputs["symbols"] if s["ticker"] in strategy_symbols
+                ]
+                strategy_tickers = self.get_tickers(strategy_ticker_symbols)
 
                 if inputs["approach"] == "master":
                     default_weight = 0  # will add the actual allocation in the model
@@ -703,11 +778,14 @@ class MasterConfig(MercuryRunConfig):
 
                 self.strategy_symbol_weights[sector]["strategies"][strategy][
                     "symbol weights"
-                ] = {sy: default_weight for sy in strategy_symbols}
+                ] = {sy.ToString(): default_weight for sy in strategy_tickers}
 
                 symbols_list += strategy_symbols
 
-        self.symbols = list(set(symbols_list))  # Get unique symbols
+        # Filter symbols by matching 'id' in symbols_ids
+        tickers = [s for s in inputs["symbols"] if s["ticker"] in symbols_list]
+
+        self.symbols = self.get_tickers(tickers)
 
         self.rebalance = inputs["Rebalance"]
         if self.rebalance == "Monthly":
@@ -719,6 +797,17 @@ class MasterConfig(MercuryRunConfig):
 
         self.next_rebal_date = self.start
         self.systems = [MasterSystemLive(self)]
+
+    def get_tickers(self, symbols):
+        tickers = List[TickerInfo]()
+        for symbol in symbols:
+            ticker = TickerInfo()
+            ticker.ticker = symbol["ticker"]
+            ticker.id = symbol["id"]
+            ticker.name = symbol["ticker"]
+            ticker.country = symbol["country"]
+            tickers.Add(ticker)
+        return tickers
 
 
 class MLModelRunner(MercuryRunner):
@@ -759,12 +848,6 @@ class MLModelRunner(MercuryRunner):
             # load configuration from file, if provided
             with open(config) as json_data:
                 cfg_data = json.load(json_data)
-
-        symbols_metadata_json = json.dumps(cfg_data["symbols_metadata"])
-        cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
-
-        # set symbols_metadata
-        self.add_metadata_from_json(symbols_metadata_json)
 
         # build system configuration
         run_config = MasterConfig(cfg_data, 201, False)

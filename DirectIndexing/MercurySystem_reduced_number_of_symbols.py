@@ -10,7 +10,11 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem  # type: ignore
+from System.Collections.Generic import List # type: ignore
+
+clr.AddReference("Mercury")
+from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
+
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -109,6 +113,7 @@ class DirectIndexingSystem(IMercurySystem):
         pass
 
     def is_rebalance_date(self):
+
         ## Currently done as monthly, start of month, for simplicity
         if self.cfg.rebalance == "Monthly":
             if self.current_date.Month != self.previous_days_month:
@@ -118,38 +123,41 @@ class DirectIndexingSystem(IMercurySystem):
             return True
 
         return False
-
+    
     def Calculate_weights_reduced_number_of_symbols(self, current_date_weights):
+
         ## Get list of all symbols since start of model
         ## Was issue where historic symbols were not removed. This forces their removal.
         current_symbols_list = current_date_weights.keys()
         self.historic_symbols_list += current_symbols_list
         self.historic_symbols_list = list(set(self.historic_symbols_list))
 
-        sort_tuple_list = sorted(
-            current_date_weights.items(), key=lambda x: x[1], reverse=True
-        )  # Largest to smallest value (list of tuples)
+        sort_tuple_list = sorted(current_date_weights.items(), key=lambda x: x[1], reverse=True)  # Largest to smallest value (list of tuples)
 
         ## Find largest weighted symbols, and scale so sum to 100%
 
-        reduced_sort_dict = {
-            key: val for key, val in sort_tuple_list[: self.cfg.number_of_symbols]
-        }
+        reduced_sort_dict = {key:val for key,val in sort_tuple_list[:self.cfg.number_of_symbols]}
         total_weight = sum(reduced_sort_dict.values())
 
         ## Reset weights to zero default for current_date_weights
         current_date_weights = {}
 
         for sy in self.historic_symbols_list:
+
             if sy in reduced_sort_dict.keys():
                 current_date_weights[sy] = reduced_sort_dict[sy] / total_weight
-
+                
             else:
                 current_date_weights[sy] = 0
 
+
         return current_date_weights
 
+
+
+
     def run_open(self):
+
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
         # print("run_open: ", current_date_s)
 
@@ -157,7 +165,8 @@ class DirectIndexingSystem(IMercurySystem):
             self.contextHolder.model_data_repository.current_date_weights
         )
 
-        current_date_weights = {k: v.weight for k, v in current_date_weights.items()}
+        current_date_weights = {k:v.weight for k,v in current_date_weights.items()}
+        
 
         if len(current_date_weights) == 0:
             print("run_open - no weights available: ", current_date_s)
@@ -170,20 +179,17 @@ class DirectIndexingSystem(IMercurySystem):
         if trade:
             print("Rebalance: ", self.current_date.ToString("yyyy-MM-dd"))
 
-            current_date_weights = self.Calculate_weights_reduced_number_of_symbols(
-                current_date_weights
-            )
+            current_date_weights = self.Calculate_weights_reduced_number_of_symbols(current_date_weights)
 
             for symbol in current_date_weights:
                 self.contextHolder.oms.add_weight_order(
-                    # RA: self.name, symbol, current_date_weights[symbol].weight
-                    self.name,
-                    symbol,
-                    current_date_weights[symbol],
-                )
-
+                    #RA: self.name, symbol, current_date_weights[symbol].weight
+                    self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol]
+                                )
+                
         else:
             current_date_weights = {}
+
 
         # if self.current_date.ToString("yyyy-MM-dd") == "2025-01-01":
         #     print(self.current_date.ToString("yyyy-MM-dd"))
@@ -193,6 +199,10 @@ class DirectIndexingSystem(IMercurySystem):
             pos_by_symbol = self.contextHolder.oms.position_by_system_and_symbol[
                 self.name
             ]
+
+
+
+
 
         if False:
             # trade if no current position
@@ -214,19 +224,13 @@ class DirectIndexingSystem(IMercurySystem):
                 and self.current_date < self.contextHolder.referenceData.config.end
                 and self.current_date < today
             ):
-                for (
-                    sm
-                ) in self.contextHolder.market_data_loader.StartAndEndBySymbol.keys():
+                for sm in self.contextHolder.market_data_loader.StartAndEndBySymbol.keys():
                     if (
-                        self.contextHolder.market_data_loader.StartAndEndBySymbol[
-                            sm
-                        ].Item2
+                        self.contextHolder.market_data_loader.StartAndEndBySymbol[sm].Item2
                         <= self.current_date
                     ):
-                        exitQty = (
-                            self.contextHolder.oms.get_position_by_system_and_symbol(
-                                self.name, sm
-                            )
+                        exitQty = self.contextHolder.oms.get_position_by_system_and_symbol(
+                            self.name, sm
                         )
                         if exitQty != 0:
                             symbols_to_exit.append(sm)
@@ -254,14 +258,17 @@ class DirectIndexingSystem(IMercurySystem):
         if False:
             if trade:
                 if len(current_date_weights) > 0:
+
                     # prev weight exit
                     if len(pos_by_symbol) > 0:
                         for ps in pos_by_symbol.keys():
-                            # print(current_date_weights[ps].weight)
+
+                            #print(current_date_weights[ps].weight)
+
 
                             if pos_by_symbol[ps] != 0 and (
                                 ps not in current_date_weights.keys()
-                                # RA: or current_date_weights[ps].weight == 0
+                                #RA: or current_date_weights[ps].weight == 0
                                 or current_date_weights[ps] == 0
                             ):
                                 symbols_to_exit.append(ps)
@@ -270,6 +277,7 @@ class DirectIndexingSystem(IMercurySystem):
 
                     print(len(current_date_weights))
                     for symbol in current_date_weights.keys():
+                        
                         if (
                             symbol not in symbols_to_exit
                             and symbol
@@ -280,10 +288,8 @@ class DirectIndexingSystem(IMercurySystem):
                             <= self.current_date
                         ):
                             self.contextHolder.oms.add_weight_order(
-                                # RA: self.name, symbol, current_date_weights[symbol].weight
-                                self.name,
-                                symbol,
-                                current_date_weights[symbol],
+                                #RA: self.name, symbol, current_date_weights[symbol].weight
+                                self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol]
                             )
 
             # entry order for symbols with no position from previous order
@@ -304,17 +310,16 @@ class DirectIndexingSystem(IMercurySystem):
                             ].Item1
                             <= self.current_date
                         ):
+                            
                             #####  RA: FIX IN THIS CASE
                             self.contextHolder.oms.add_weight_order(
-                                # RA: self.name, symbol, current_date_weights[symbol].weight
-                                self.name,
-                                symbol,
-                                current_date_weights[symbol],
+                                #RA: self.name, symbol, current_date_weights[symbol].weight
+                                self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol]
                             )
         if True:
             if len(symbols_to_exit) > 0:
                 for xs in symbols_to_exit:
-                    self.contextHolder.oms.add_weight_order(self.name, xs, 0)
+                    self.contextHolder.oms.add_weight_order(self.name, TickerInfo.Deserealize(xs), 0)
 
     def run(self):
         pass
@@ -372,7 +377,8 @@ class DirectIndexingConfig(MercuryRunConfig):
 
         # overwrite from cfg
         if cfg is not None:
-            print(cfg["parameters"])
+
+            print(cfg['parameters'])
 
             start_date = pd.to_datetime(cfg["parameters"]["Start_Date"])
             initial_equity = float(cfg["parameters"]["Initial_Equity"])
@@ -380,7 +386,7 @@ class DirectIndexingConfig(MercuryRunConfig):
             self.start = DateTime(start_date.year, start_date.month, start_date.day)
             self.equity = initial_equity
 
-            self.symbols = list(cfg["symbols"])
+            self.symbols = self.get_tickers(cfg["symbols"]) 
 
             self.rebalance = "Monthly"
             if "Rebalance" in cfg["parameters"] and (
@@ -394,7 +400,17 @@ class DirectIndexingConfig(MercuryRunConfig):
 
             self.systems = [DirectIndexingSystem(self)]
 
-
+    def get_tickers(self, symbols):
+        tickers = List[TickerInfo]()
+        for symbol in symbols:
+            ticker = TickerInfo()
+            ticker.ticker = symbol["ticker"]
+            ticker.id = symbol["id"]
+            ticker.name = symbol["ticker"]
+            ticker.country = symbol["country"]
+            tickers.Add(ticker)
+        return tickers
+    
 class DirectIndexingModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
@@ -402,8 +418,8 @@ class DirectIndexingModelRunner(MercuryRunner):
         super().__init__()
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
+
         cfg_data = None
-        symbols_metadata_json = None
 
         if model_id > 0:
             # load configuration from database
@@ -411,17 +427,12 @@ class DirectIndexingModelRunner(MercuryRunner):
 
             if cfg_data_json is not None:
                 cfg_data = json.loads(cfg_data_json)
-                symbols_metadata_json = cfg_data["symbols_metadata"]
 
         elif config is not None:
             # load configuration from file, if provided
             with open(config) as json_data:
                 cfg_data = json.load(json_data)
-                symbols_metadata_json = json.dumps(cfg_data["symbols_metadata"])
-                cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
-
-        # set symbols_metadata
-        self.add_metadata_from_json(symbols_metadata_json)
+                # cfg_data["symbols"] = list(cfg_data["symbols"])
 
         run_config = DirectIndexingConfig(cfg_data)
 
@@ -451,6 +462,7 @@ class DirectIndexingModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
+
     diModelRunner = DirectIndexingModelRunner()
 
     runId = diModelRunner.run_model(model_id, update_qdeck, live, config)

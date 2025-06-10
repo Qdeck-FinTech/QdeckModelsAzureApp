@@ -3,22 +3,43 @@
   "Initial_Equity": "100000000",
   "Rebalance": "Monthly",
   "Compounded_pl": true,
-
   "Portfolio": {
     "Fixed Income": {
       "weight": 0.4,
       "strategies": {
         "US Fixed Income": {
           "weight": 0.85,
-          "symbols": ["BIL", "IEF", "TLH", "IGSB", "AGG", "IGLB", "MBB", "HYG"]
+          "symbols": [
+            "BIL",
+            "IEF",
+            "TLH",
+            "IGSB",
+            "AGG",
+            "IGLB",
+            "MBB",
+            "HYG"
+          ]
         },
-        "Other Fixed Income": { "weight": 0.15, "symbols": ["BIL", "TLT"] }
+        "Other Fixed Income": {
+          "weight": 0.15,
+          "symbols": [
+            "BIL",
+            "TLT"
+          ]
+        }
       }
     },
     "Equity": {
       "weight": 0.6,
       "strategies": {
-        "US Equity": { "weight": 0.25, "symbols": ["IVV", "ONEQ", "IWM"] },
+        "US Equity": {
+          "weight": 0.25,
+          "symbols": [
+            "IVV",
+            "ONEQ",
+            "IWM"
+          ]
+        },
         "Sector Equity": {
           "weight": 0.25,
           "symbols": [
@@ -33,10 +54,21 @@
             "VCR"
           ]
         },
-        "International Equity": { "weight": 0.25, "symbols": ["SPY", "ACWI"] },
+        "International Equity": {
+          "weight": 0.25,
+          "symbols": [
+            "SPY",
+            "ACWI"
+          ]
+        },
         "Factor Equity": {
           "weight": 0.25,
-          "symbols": ["VLUE", "QUAL", "MTUM", "USMV"]
+          "symbols": [
+            "VLUE",
+            "QUAL",
+            "MTUM",
+            "USMV"
+          ]
         }
       }
     }

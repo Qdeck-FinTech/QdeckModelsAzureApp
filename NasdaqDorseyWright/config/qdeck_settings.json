@@ -9,48 +9,48 @@
     "Start_Date": "2016-01-29"
   },
   "symbol_weights": {},
-  "symbols_metadata": {
-    "PHO": {
+  "symbols": [
+    {
       "country": "US",
       "id": "73935X57",
       "name": "INVESCO EXCHANGE TRADED FD T WATER RES ETF",
       "ticker": "PHO"
     },
-    "PKB": {
+    {
       "country": "US",
       "id": "73935X66",
       "name": "INVESCO EXCHANGE TRADED FD T BUILDING & CONST",
       "ticker": "PKB"
     },
-    "PNQI": {
+    {
       "country": "US",
       "id": "73935X14",
       "name": "INVESCO EXCHANGE TRADED FD T NASDAQ INTERNT",
       "ticker": "PNQI"
     },
-    "PPA": {
+    {
       "country": "US",
       "id": "73935X69",
       "name": "INVESCO EXCHANGE TRADED FD T AEROSPACE DEFN",
       "ticker": "PPA"
     },
-    "PSI": {
+    {
       "country": "US",
       "id": "73935X78",
       "name": "INVESCO EXCHANGE TRADED FD T SEMICONDUCTORS",
       "ticker": "PSI"
     },
-    "PTF": {
+    {
       "country": "US",
       "id": "73935X34",
       "name": "INVESCO EXCHANGE TRADED FD T DORSEY WRGT TECH",
       "ticker": "PTF"
     },
-    "PXJ": {
+    {
       "country": "US",
       "id": "73935X62",
       "name": "INVESCO EXCHANGE TRADED FD T OIL & GAS SERVIC",
       "ticker": "PXJ"
     }
-  }
+  ]
 }

@@ -11,7 +11,11 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, PriceField  # type: ignore
+from System.Collections.Generic import List  # type: ignore
+
+clr.AddReference("Mercury")
+from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
+
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -130,7 +134,9 @@ class KeebeckMultiStrategy(IMercurySystem):
 
             for symbol, weight in self.symbols_weights_d.items():
                 if weight > 0:
-                    self.contextHolder.oms.add_weight_order(self.name, symbol, weight)
+                    self.contextHolder.oms.add_weight_order(
+                        self.name, TickerInfo.Deserealize(symbol), weight
+                    )
 
             self.rebalance = False
 
@@ -211,19 +217,30 @@ class KeebeckMultiStrategyConfig(MercuryRunConfig):
             ) in self.strategies:  # Get list of symbols, and dict of {sy:weight}
                 strategy = self.strategies[strategy_name]
 
-                symbols += strategy["symbols"]
+                strategy_symbols = strategy["symbols"]
 
-                for sy, w in strategy["weights"].items():
+                strategy_symbol_tickers = [
+                    s for s in cfg["symbols"] if s["ticker"] in strategy_symbols
+                ]
+
+                existing = [s["ticker"] for s in symbols]
+                for s in strategy_symbol_tickers:
+                    if s["ticker"] not in existing:
+                        symbols.append(s)
+                        existing.append(s["ticker"])
+
+                strategy_tickers = self.get_tickers(strategy_symbol_tickers)
+
+                for ticker in strategy_tickers:
+                    sy = ticker.ToString()
+                    w = strategy["weights"].get(ticker.ticker, 0)
+
                     if sy in symbols_weights_d:
                         symbols_weights_d[sy] += w
-
                     else:
                         symbols_weights_d[sy] = w
 
-            self.symbols = list(
-                set(symbols)
-            )  # Ensures symbol only included once in list
-
+            self.symbols = self.get_tickers(symbols)
             self.symbols_weights_d = symbols_weights_d
 
             self.rebalance = cfg["Rebalance"]
@@ -234,6 +251,17 @@ class KeebeckMultiStrategyConfig(MercuryRunConfig):
 
             self.next_rebal_date = self.start
             self.systems = [KeebeckMultiStrategy(self)]
+
+    def get_tickers(self, symbols):
+        tickers = List[TickerInfo]()
+        for symbol in symbols:
+            ticker = TickerInfo()
+            ticker.ticker = symbol["ticker"]
+            ticker.id = symbol["id"]
+            ticker.name = symbol["ticker"]
+            ticker.country = symbol["country"]
+            tickers.Add(ticker)
+        return tickers
 
 
 class KeebeckMultiStrategyModelRunner(MercuryRunner):
@@ -278,12 +306,6 @@ class KeebeckMultiStrategyModelRunner(MercuryRunner):
         runId = 0
 
         if cfg_data is not None:
-            symbols_metadata_json = json.dumps(cfg_data["symbols_metadata"])
-            cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
-
-            # set symbols_metadata
-            self.add_metadata_from_json(symbols_metadata_json)
-
             # build system configuration
             run_config = KeebeckMultiStrategyConfig(cfg_data, 201, False)
 

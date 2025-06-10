@@ -10,7 +10,11 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem  # type: ignore
+from System.Collections.Generic import List # type: ignore
+
+clr.AddReference("Mercury")
+from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
+
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -103,6 +107,7 @@ class AlphaVeeWeightRebalanceSystem(IMercurySystem):
         pass
 
     def run_open(self):
+
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
         # print("run_open: ", current_date_s)
         #
@@ -154,7 +159,7 @@ class AlphaVeeWeightRebalanceSystem(IMercurySystem):
                     <= self.current_date
                 ):
                     exitQty = self.contextHolder.oms.get_position_by_system_and_symbol(
-                        self.name, sm
+                        self.name, TickerInfo.Deserealize(sm)
                     )
                     if exitQty != 0:
                         symbols_to_exit.append(sm)
@@ -181,6 +186,7 @@ class AlphaVeeWeightRebalanceSystem(IMercurySystem):
 
         if trade:
             if len(current_date_weights) > 0:
+
                 # prev weight exit
                 if len(pos_by_symbol) > 0:
                     for ps in pos_by_symbol.keys():
@@ -202,13 +208,14 @@ class AlphaVeeWeightRebalanceSystem(IMercurySystem):
                         <= self.current_date
                     ):
                         self.contextHolder.oms.add_weight_order(
-                            self.name, symbol, current_date_weights[symbol].weight
+                            self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol].weight
                         )
 
         # entry order for symbols with no position from previous order
         if not trade:
             if len(current_date_weights) > 0 and len(pos_by_symbol) > 0:
                 for symbol in current_date_weights.keys():
+
                     pos = 0
                     if symbol in pos_by_symbol.keys():
                         pos = pos_by_symbol[symbol]
@@ -224,12 +231,12 @@ class AlphaVeeWeightRebalanceSystem(IMercurySystem):
                         <= self.current_date
                     ):
                         self.contextHolder.oms.add_weight_order(
-                            self.name, symbol, current_date_weights[symbol].weight
+                            self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol].weight
                         )
 
         if len(symbols_to_exit) > 0:
             for xs in symbols_to_exit:
-                self.contextHolder.oms.add_weight_order(self.name, xs, 0)
+                self.contextHolder.oms.add_weight_order(self.name, TickerInfo.Deserealize(xs), 0)
 
     def run(self):
         pass
@@ -285,13 +292,14 @@ class AlphaVeeWeightRebalanceConfig(MercuryRunConfig):
 
         # overwrite from cfg
         if cfg is not None:
+
             start_date = pd.to_datetime(cfg["parameters"]["Start_Date"])
             initial_equity = float(cfg["parameters"]["Initial_Equity"])
 
             self.start = DateTime(start_date.year, start_date.month, start_date.day)
             self.equity = initial_equity
 
-            self.symbols = list(cfg["symbols"])
+            self.symbols = self.get_tickers(cfg["symbols"]) 
 
             if isinstance(cfg["external_model_id"], int):
                 external_model_id = int(cfg["external_model_id"])
@@ -299,6 +307,16 @@ class AlphaVeeWeightRebalanceConfig(MercuryRunConfig):
 
             self.systems = [AlphaVeeWeightRebalanceSystem(self)]
 
+    def get_tickers(self, symbols):
+        tickers = List[TickerInfo]()
+        for symbol in symbols:
+            ticker = TickerInfo()
+            ticker.ticker = symbol["ticker"]
+            ticker.id = symbol["id"]
+            ticker.name = symbol["ticker"]
+            ticker.country = symbol["country"]
+            tickers.Add(ticker)
+        return tickers
 
 class AVModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
@@ -307,8 +325,8 @@ class AVModelRunner(MercuryRunner):
         super().__init__()
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
+
         cfg_data = None
-        symbols_metadata_json = None
 
         if model_id > 0:
             # load configuration from database
@@ -316,17 +334,13 @@ class AVModelRunner(MercuryRunner):
 
             if cfg_data_json is not None:
                 cfg_data = json.loads(cfg_data_json)
-                symbols_metadata_json = cfg_data["symbols_metadata"]
 
         elif config is not None:
             # load configuration from file, if provided
             with open(config) as json_data:
                 cfg_data = json.load(json_data)
-                symbols_metadata_json = json.dumps(cfg_data["symbols_metadata"])
-                cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
+                # cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
 
-        # set symbols_metadata
-        self.add_metadata_from_json(symbols_metadata_json)
 
         run_config = AlphaVeeWeightRebalanceConfig(cfg_data)
         run_config.run_time_pst = "100000000"
@@ -350,6 +364,7 @@ class AVModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
+
     avModelRunner = AVModelRunner()
 
     runId = avModelRunner.run_model(model_id, update_qdeck, live, config)

@@ -21,30 +21,30 @@
       "NVDA": "0.6"
     }
   },
-  "symbols_metadata": {
-    "AAPL": {
+  "symbols": [
+    {
       "country": "US",
       "id": "AAPL",
       "name": "APPLE",
       "ticker": "AAPL"
     },
-    "AMZN": {
+    {
       "country": "US",
       "id": "AMZN",
       "name": "AMZN",
       "ticker": "AMZN"
     },
-    "MSFT": {
+    {
       "country": "US",
       "id": "MSFT",
       "name": "Microsoft",
       "ticker": "MSFT"
     },
-    "NVDA": {
+    {
       "country": "US",
       "id": "NVDA",
       "name": "NVDA",
       "ticker": "NVDA"
     }
-  }
+  ]
 }

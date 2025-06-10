@@ -12,7 +12,10 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem  # type: ignore
+from System.Collections.Generic import List  # type: ignore
+
+clr.AddReference("Mercury")
+from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -109,14 +112,14 @@ class NDWStopLossSystem(IMercurySystem):
     def order_filled(self, order):
         print(
             "order_filled: ",
-            order.symbol,
+            order.ticker.ToString(),
             order.fill_date.ToString("yyyy-MM-dd"),
             order.quantity,
         )
 
         # store the latest date for the fill
         if order is not None:
-            self.active_position_fills[order.symbol] = order.fill_date
+            self.active_position_fills[order.ticker.ToString()] = order.fill_date
 
     def eval_stop_loss(self, symbol, current_position):
         # ignore if current position = 0
@@ -230,7 +233,7 @@ class NDWStopLossSystem(IMercurySystem):
                     <= self.current_date
                 ):
                     exitQty = self.contextHolder.oms.get_position_by_system_and_symbol(
-                        self.name, sm
+                        self.name, TickerInfo.Deserealize(sm)
                     )
                     if exitQty != 0:
                         # add symbol to exit
@@ -340,11 +343,15 @@ class NDWStopLossSystem(IMercurySystem):
         ## add exit orders
         if len(self.symbols_to_exit) > 0:
             for xs in self.symbols_to_exit:
-                self.contextHolder.oms.add_weight_order(self.name, xs, 0)
+                self.contextHolder.oms.add_weight_order(
+                    self.name, TickerInfo.Deserealize(xs), 0
+                )
 
         ## add entry orders
         for sy, weight in self.symbols_weights_to_enter_d.items():
-            self.contextHolder.oms.add_weight_order(self.name, sy, weight)
+            self.contextHolder.oms.add_weight_order(
+                self.name, TickerInfo.Deserealize(sy), weight
+            )
 
         # update previous month, if changed
         if self.current_date.Month != self.previous_month:
@@ -413,7 +420,7 @@ class NDWStopLossConfig(MercuryRunConfig):
             self.start = DateTime(start_date.year, start_date.month, start_date.day)
             self.equity = initial_equity
 
-            self.symbols = list(cfg["symbols"])
+            self.symbols = self.get_tickers(cfg["symbols"])
 
             if isinstance(cfg["external_model_id"], int):
                 external_model_id = int(cfg["external_model_id"])
@@ -432,6 +439,17 @@ class NDWStopLossConfig(MercuryRunConfig):
 
             self.systems = [NDWStopLossSystem(self)]
 
+    def get_tickers(self, symbols):
+        tickers = List[TickerInfo]()
+        for symbol in symbols:
+            ticker = TickerInfo()
+            ticker.ticker = symbol["ticker"]
+            ticker.id = symbol["id"]
+            ticker.name = symbol["ticker"]
+            ticker.country = symbol["country"]
+            tickers.Add(ticker)
+        return tickers
+
 
 class NDWStopLossRunner(MercuryRunner):
     __namespace__ = "Mercury"
@@ -441,7 +459,6 @@ class NDWStopLossRunner(MercuryRunner):
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
         cfg_data = None
-        symbols_metadata_json = None
 
         if model_id > 0:
             # load configuration from database
@@ -449,17 +466,12 @@ class NDWStopLossRunner(MercuryRunner):
 
             if cfg_data_json is not None:
                 cfg_data = json.loads(cfg_data_json)
-                symbols_metadata_json = cfg_data["symbols_metadata"]
 
         elif config is not None:
             # load configuration from file, if provided
             with open(config) as json_data:
                 cfg_data = json.load(json_data)
-                symbols_metadata_json = json.dumps(cfg_data["symbols_metadata"])
-                cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
-
-        # set symbols_metadata
-        self.add_metadata_from_json(symbols_metadata_json)
+                cfg_data["symbols"] = list(cfg_data["symbols"])
 
         run_config = NDWStopLossConfig(cfg_data)
 

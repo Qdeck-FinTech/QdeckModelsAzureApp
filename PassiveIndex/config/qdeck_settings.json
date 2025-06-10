@@ -19,18 +19,18 @@
       "AGG": "1.0"
     }
   },
-  "symbols_metadata": {
-    "ACWI": {
+  "symbols": [
+    {
       "country": "US",
       "id": "46428825",
       "name": "ISHARES TR MSCI ACWI ETF",
       "ticker": "ACWI"
     },
-    "AGG": {
+    {
       "country": "US",
       "id": "46428722",
       "name": "ISHARES TR CORE US AGGBD ET",
       "ticker": "AGG"
     }
-  }
+  ]
 }

@@ -1010,17 +1010,19 @@ class LongShortRatioStat(IMercuryStat):
 
         for order in self.contextHolder.oms.filled_orders: 
 
+            order_symbol = order.ticker.ToString()
+
             if order.system not in  positionBySystemAndSymbol:
                 positionBySystemAndSymbol[order.system] = {}
 
-            if order.symbol not in  positionBySystemAndSymbol[order.system]:
-                positionBySystemAndSymbol[order.system][order.symbol] = 0
+            if order_symbol not in  positionBySystemAndSymbol[order.system]:
+                positionBySystemAndSymbol[order.system][order_symbol] = 0
 
             # ok now see if we're going from 0 or crossing 0.  for crossing, check if the qty is 
             # opposite sign and Abs() bigger than the position
-            if positionBySystemAndSymbol[order.system][order.symbol] == 0 or \
-                    ( ( abs( order.quantity ) > abs( positionBySystemAndSymbol[order.system][order.symbol] ) ) and
-                      ( np.sign( order.quantity ) != np.sign( positionBySystemAndSymbol[order.system][order.symbol] ) ) ):
+            if positionBySystemAndSymbol[order.system][order_symbol] == 0 or \
+                    ( ( abs( order.quantity ) > abs( positionBySystemAndSymbol[order.system][order_symbol] ) ) and
+                      ( np.sign( order.quantity ) != np.sign( positionBySystemAndSymbol[order.system][order_symbol] ) ) ):
                 
                 #  this is initiating a positon from 0 or crossing 0 - adjust the trade counter
                 if( order.quantity > 0 ):
@@ -1030,7 +1032,7 @@ class LongShortRatioStat(IMercuryStat):
                     
                 
             # regardless adjust the position
-            positionBySystemAndSymbol[order.system][order.symbol] += order.quantity
+            positionBySystemAndSymbol[order.system][order_symbol] += order.quantity
             
         value = 1
         if shortTrades != 0: 

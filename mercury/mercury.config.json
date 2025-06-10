@@ -2,7 +2,7 @@
   "SQLSettings": {
     "refinitivDataSQL": "packet size=4096;Connection Timeout=150;Data Source=qai97-qadirectcloud-default-A045.database.windows.net;Initial Catalog=qai;User Id=a045.brad.ostercamp;Password=w7vFGTzsgx%ml9V1",
     "qdeckSqlConnectionString": "packet size=4096;Connection Timeout=150;Server=xdsqlx01;Trust Server Certificate=True;Database=dbQdeckDev;User Id=QdeckSQLUser;Password=Tnb+L6=oUGBI",
-    "qdeckPostgresConnectionString": "Server=dbqdeck-dev.postgres.database.azure.com;Database=dbqdeckdev;Port=5432;User Id=Qd3ckAdm1n;Password=m2u4k6iYN8l6OVRnbVGz;Ssl Mode=Require;",
+    "qdeckPostgresConnectionString": "Server=dbqdeck-dev.postgres.database.azure.com;Database=dbqdeckdev;Port=5432;User Id=Qd3ckAdm1n;Password=m2u4k6iYN8l6OVRnbVGz;Ssl Mode=Require",
     "usePostgres": true
   },
   "StatusNotificationSettings": {

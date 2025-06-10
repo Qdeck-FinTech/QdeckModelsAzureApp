@@ -12,7 +12,11 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem  # type: ignore
+from System.Collections.Generic import List # type: ignore
+
+clr.AddReference("Mercury")
+from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
+
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -242,7 +246,7 @@ class EquityFixedIncomePassiveConfig(MercuryRunConfig):
                 }
                 weights["Weights"].update(abs_weight)
 
-            self.symbols = weights["Weights"].keys()
+            self.symbols = self.get_tickers(cfg["symbols"])  # weights["Weights"].keys()
             weights = np.array(list(weights["Weights"].values()))
 
             if np.sum(weights) > 1:
@@ -275,6 +279,16 @@ class EquityFixedIncomePassiveConfig(MercuryRunConfig):
             self.next_rebal_date = self.start
             self.systems = [PassiveExposure(self)]
 
+    def get_tickers(self, symbols):
+        tickers = List[TickerInfo]()
+        for symbol in symbols:
+            ticker = TickerInfo()
+            ticker.ticker = symbol["ticker"]
+            ticker.id = symbol["id"]
+            ticker.name = symbol["ticker"]
+            ticker.country = symbol["country"]
+            tickers.Add(ticker)
+        return tickers
 
 class PassiveIndexModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
@@ -283,8 +297,8 @@ class PassiveIndexModelRunner(MercuryRunner):
         super().__init__()
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
+
         cfg_data = None
-        symbols_metadata_json = None
 
         if model_id > 0:
             # load configuration from database
@@ -292,17 +306,12 @@ class PassiveIndexModelRunner(MercuryRunner):
 
             if cfg_data_json is not None:
                 cfg_data = json.loads(cfg_data_json)
-                symbols_metadata_json = cfg_data["symbols_metadata"]
 
         elif config is not None:
             # load configuration from file, if provided
             with open(config) as json_data:
                 cfg_data = json.load(json_data)
-                symbols_metadata_json = json.dumps(cfg_data["symbols_metadata"])
-                cfg_data["symbols"] = list(cfg_data["symbols_metadata"].keys())
-
-        # set symbols_metadata
-        self.add_metadata_from_json(symbols_metadata_json)
+                cfg_data["symbols"] = list(cfg_data["symbols"])
 
         # build system configuration
         run_config = EquityFixedIncomePassiveConfig(cfg_data)
@@ -327,6 +336,7 @@ class PassiveIndexModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
+
     piModelRunner = PassiveIndexModelRunner()
 
     runId = piModelRunner.run_model(model_id, update_qdeck, live, config)

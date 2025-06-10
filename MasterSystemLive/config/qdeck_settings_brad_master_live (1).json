@@ -5,11 +5,19 @@
     "Equity": {
       "strategies": {
         "Factor Equity": {
-          "symbols": ["VLUE", "QUAL", "MTUM", "USMV"],
+          "symbols": [
+            "VLUE",
+            "QUAL",
+            "MTUM",
+            "USMV"
+          ],
           "weight": 0.25
         },
         "International Equity": {
-          "symbols": ["IVV", "ACWI"],
+          "symbols": [
+            "IVV",
+            "ACWI"
+          ],
           "weight": 0.25
         },
         "Sector Equity": {
@@ -27,7 +35,11 @@
           "weight": 0.25
         },
         "US Equity": {
-          "symbols": ["IVV", "ONEQ", "IWM"],
+          "symbols": [
+            "IVV",
+            "ONEQ",
+            "IWM"
+          ],
           "weight": 0.25
         }
       },
@@ -36,11 +48,23 @@
     "Fixed Income": {
       "strategies": {
         "Other Fixed Income": {
-          "symbols": ["BIL", "TLT"],
+          "symbols": [
+            "BIL",
+            "TLT"
+          ],
           "weight": 0.15
         },
         "US Fixed Income": {
-          "symbols": ["BIL", "IEF", "TLH", "IGSB", "AGG", "IGLB", "MBB", "HYG"],
+          "symbols": [
+            "BIL",
+            "IEF",
+            "TLH",
+            "IGSB",
+            "AGG",
+            "IGLB",
+            "MBB",
+            "HYG"
+          ],
           "weight": 0.85
         }
       },

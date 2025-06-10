@@ -10,51 +10,51 @@
     "Start_Date": "2018-01-29"
   },
   "symbol_weights": {},
-  "symbols_metadata": {
-    "VAW": {
+  "symbols": [
+    {
       "country": "US",
       "id": "92204A80",
       "ticker": "VAW"
     },
-    "VCR": {
+    {
       "country": "US",
       "id": "92204A10",
       "ticker": "VCR"
     },
-    "VDC": {
+    {
       "country": "US",
       "id": "92204A20",
       "ticker": "VDC"
     },
-    "VDE": {
+    {
       "country": "US",
       "id": "92204A30",
       "ticker": "VDE"
     },
-    "VFH": {
+    {
       "country": "US",
       "id": "92204A40",
       "ticker": "VFH"
     },
-    "VGT": {
+    {
       "country": "US",
       "id": "92204A70",
       "ticker": "VGT"
     },
-    "VHT": {
+    {
       "country": "US",
       "id": "92204A50",
       "ticker": "VHT"
     },
-    "VIS": {
+    {
       "country": "US",
       "id": "92204A60",
       "ticker": "VIS"
     },
-    "VPU": {
+    {
       "country": "US",
       "id": "92204A87",
       "ticker": "VPU"
     }
-  }
+  ]
 }
