@@ -165,6 +165,9 @@ class KeebeckMultiStrategyConfig(MercuryRunConfig):
         self.pl_options.compounded_pl = True
 
         self.name = "KeebeckMultiStrategy"
+
+        self.save_stats_to_file = False
+        self.save_outputs_to_file = False
         self.output_folder = "output"
 
         self.production = False

@@ -388,6 +388,8 @@ class NDWStopLossConfig(MercuryRunConfig):
         self.logging_options.weight_order_no_bars = True
         self.logging_options.cash_management = True
 
+        self.save_stats_to_file = False
+        self.save_outputs_to_file = False
         self.output_folder = "output"
 
         # overwrite default stats

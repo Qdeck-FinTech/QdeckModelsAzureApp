@@ -10,7 +10,7 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from System.Collections.Generic import List # type: ignore
+from System.Collections.Generic import List  # type: ignore
 
 clr.AddReference("Mercury")
 from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
@@ -109,7 +109,6 @@ class DorseyWrightWeightRebalanceSystem(IMercurySystem):
         pass
 
     def run_open(self):
-
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
         # print("run_open: ", current_date_s)
 
@@ -188,7 +187,6 @@ class DorseyWrightWeightRebalanceSystem(IMercurySystem):
 
         if trade:
             if len(current_date_weights) > 0:
-
                 # prev weight exit
                 if len(pos_by_symbol) > 0:
                     for ps in pos_by_symbol.keys():
@@ -210,14 +208,15 @@ class DorseyWrightWeightRebalanceSystem(IMercurySystem):
                         <= self.current_date
                     ):
                         self.contextHolder.oms.add_weight_order(
-                            self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol].weight
+                            self.name,
+                            TickerInfo.Deserealize(symbol),
+                            current_date_weights[symbol].weight,
                         )
 
         # entry order for symbols with no position from previous order
         if not trade:
             if len(current_date_weights) > 0 and len(pos_by_symbol) > 0:
                 for symbol in current_date_weights.keys():
-
                     pos = 0
                     if symbol in pos_by_symbol.keys():
                         pos = pos_by_symbol[symbol]
@@ -233,12 +232,16 @@ class DorseyWrightWeightRebalanceSystem(IMercurySystem):
                         <= self.current_date
                     ):
                         self.contextHolder.oms.add_weight_order(
-                            self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol].weight
+                            self.name,
+                            TickerInfo.Deserealize(symbol),
+                            current_date_weights[symbol].weight,
                         )
 
         if len(symbols_to_exit) > 0:
             for xs in symbols_to_exit:
-                self.contextHolder.oms.add_weight_order(self.name, TickerInfo.Deserealize(xs), 0)
+                self.contextHolder.oms.add_weight_order(
+                    self.name, TickerInfo.Deserealize(xs), 0
+                )
 
     def run(self):
         pass
@@ -268,6 +271,8 @@ class NDWWeightRebalanceConfig(MercuryRunConfig):
 
         self.logging_options.weight_order_no_bars = True
 
+        self.save_stats_to_file = False
+        self.save_outputs_to_file = False
         self.output_folder = "output"
 
         # overwrite default stats
@@ -294,21 +299,19 @@ class NDWWeightRebalanceConfig(MercuryRunConfig):
 
         # overwrite from cfg
         if cfg is not None:
-
             start_date = pd.to_datetime(cfg["parameters"]["Start_Date"])
             initial_equity = float(cfg["parameters"]["Initial_Equity"])
 
             self.start = DateTime(start_date.year, start_date.month, start_date.day)
             self.equity = initial_equity
 
-            self.symbols = self.get_tickers(cfg["symbols"]) 
+            self.symbols = self.get_tickers(cfg["symbols"])
 
             if isinstance(cfg["external_model_id"], int):
                 external_model_id = int(cfg["external_model_id"])
                 self.external_model_id = external_model_id
 
             self.systems = [DorseyWrightWeightRebalanceSystem(self)]
-            
 
     def get_tickers(self, symbols):
         tickers = List[TickerInfo]()
@@ -329,7 +332,6 @@ class NDWModelRunner(MercuryRunner):
         super().__init__()
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
-
         cfg_data = None
 
         if model_id > 0:
@@ -383,7 +385,6 @@ class NDWModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
-
     dwModelRunner = NDWModelRunner()
 
     runId = dwModelRunner.run_model(model_id, update_qdeck, live, config)

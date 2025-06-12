@@ -12,7 +12,7 @@ project_dir = os.path.dirname(code_dir)
 sys.path.insert(0, project_dir)
 
 from System import DateTime  # type: ignore
-from System.Collections.Generic import List # type: ignore
+from System.Collections.Generic import List  # type: ignore
 
 clr.AddReference("Mercury")
 from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
@@ -170,7 +170,11 @@ class EquityFixedIncomePassiveConfig(MercuryRunConfig):
         self.pl_options.include_commission = False
         self.name = "PassiveExposure"
         self.max_buffer_size = max_buffer
+
+        self.save_stats_to_file = False
+        self.save_outputs_to_file = False
         self.output_folder = "output"
+
         self.production = False
         self.publish_status = False
 
@@ -290,6 +294,7 @@ class EquityFixedIncomePassiveConfig(MercuryRunConfig):
             tickers.Add(ticker)
         return tickers
 
+
 class PassiveIndexModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
@@ -297,7 +302,6 @@ class PassiveIndexModelRunner(MercuryRunner):
         super().__init__()
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
-
         cfg_data = None
 
         if model_id > 0:
@@ -336,7 +340,6 @@ class PassiveIndexModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
-
     piModelRunner = PassiveIndexModelRunner()
 
     runId = piModelRunner.run_model(model_id, update_qdeck, live, config)

@@ -12,7 +12,7 @@ sys.path.insert(0, project_dir)
 
 
 from System import DateTime  # type: ignore
-from System.Collections.Generic import List # type: ignore
+from System.Collections.Generic import List  # type: ignore
 
 clr.AddReference("Mercury")
 from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
@@ -113,7 +113,6 @@ class DirectIndexingSystem(IMercurySystem):
         pass
 
     def is_rebalance_date(self):
-
         ## Currently done as monthly, start of month, for simplicity
         if self.cfg.rebalance == "Monthly":
             if self.current_date.Month != self.previous_days_month:
@@ -125,7 +124,6 @@ class DirectIndexingSystem(IMercurySystem):
         return False
 
     def run_open(self):
-
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
         # print("run_open: ", current_date_s)
 
@@ -203,7 +201,6 @@ class DirectIndexingSystem(IMercurySystem):
 
         if trade:
             if len(current_date_weights) > 0:
-
                 # prev weight exit
                 if len(pos_by_symbol) > 0:
                     for ps in pos_by_symbol.keys():
@@ -225,7 +222,9 @@ class DirectIndexingSystem(IMercurySystem):
                         <= self.current_date
                     ):
                         self.contextHolder.oms.add_weight_order(
-                            self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol].weight
+                            self.name,
+                            TickerInfo.Deserealize(symbol),
+                            current_date_weights[symbol].weight,
                         )
 
         # entry order for symbols with no position from previous order
@@ -247,12 +246,16 @@ class DirectIndexingSystem(IMercurySystem):
                         <= self.current_date
                     ):
                         self.contextHolder.oms.add_weight_order(
-                            self.name, TickerInfo.Deserealize(symbol), current_date_weights[symbol].weight
+                            self.name,
+                            TickerInfo.Deserealize(symbol),
+                            current_date_weights[symbol].weight,
                         )
 
         if len(symbols_to_exit) > 0:
             for xs in symbols_to_exit:
-                self.contextHolder.oms.add_weight_order(self.name, TickerInfo.Deserealize(xs), 0)
+                self.contextHolder.oms.add_weight_order(
+                    self.name, TickerInfo.Deserealize(xs), 0
+                )
 
     def run(self):
         pass
@@ -282,6 +285,8 @@ class DirectIndexingConfig(MercuryRunConfig):
 
         self.logging_options.weight_order_no_bars = True
 
+        self.save_stats_to_file = False
+        self.save_outputs_to_file = False
         self.output_folder = "output"
 
         # overwrite default stats
@@ -308,14 +313,13 @@ class DirectIndexingConfig(MercuryRunConfig):
 
         # overwrite from cfg
         if cfg is not None:
-
             start_date = pd.to_datetime(cfg["parameters"]["Start_Date"])
             initial_equity = float(cfg["parameters"]["Initial_Equity"])
 
             self.start = DateTime(start_date.year, start_date.month, start_date.day)
             self.equity = initial_equity
 
-            self.symbols = self.get_tickers(cfg["symbols"]) 
+            self.symbols = self.get_tickers(cfg["symbols"])
 
             self.rebalance = "Monthly"
             if "Rebalance" in cfg["parameters"] and (
@@ -339,7 +343,8 @@ class DirectIndexingConfig(MercuryRunConfig):
             ticker.country = symbol["country"]
             tickers.Add(ticker)
         return tickers
-    
+
+
 class DirectIndexingModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
@@ -347,7 +352,6 @@ class DirectIndexingModelRunner(MercuryRunner):
         super().__init__()
 
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
-
         cfg_data = None
 
         if model_id > 0:
