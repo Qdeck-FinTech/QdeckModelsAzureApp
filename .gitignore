@@ -140,3 +140,6 @@ mercury/output/
 AzuriteConfig
 
 .DS_Store
+
+
+docker

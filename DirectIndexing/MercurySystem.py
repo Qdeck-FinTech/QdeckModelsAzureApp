@@ -10,6 +10,7 @@ project_dir = os.path.dirname(code_dir)
 
 sys.path.insert(0, project_dir)
 
+import clr
 
 from System import DateTime  # type: ignore
 from System.Collections.Generic import List  # type: ignore
