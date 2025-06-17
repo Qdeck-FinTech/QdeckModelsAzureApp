@@ -94,11 +94,15 @@ class QdeckModelRunner(MercuryRunner):
         return runId
 
 
-myApp = df.DFApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+myApp = df.DFApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 
 # An HTTP-triggered function with a Durable Functions client binding
-@myApp.route(route="orchestrators/{functionName}")
+@myApp.route(
+    route="orchestrators/{functionName}",
+    methods=[func.HttpMethod.POST],
+    auth_level=func.AuthLevel.FUNCTION,
+)
 @myApp.durable_client_input(client_name="client")
 async def http_start(req: func.HttpRequest, client):
     function_name = req.route_params.get("functionName")

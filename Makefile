@@ -42,15 +42,13 @@ deploy: confirm_tag
 	@echo "Deploying image to Azure Container Registry..."
 	# az acr login --name $(REGISTRY)
 	docker push $(FULL_NEW_IMAGE_NAME)
-	az acr update -n $(REGISTRY) --admin-enabled true
+	# az acr update -n $(REGISTRY) --admin-enabled true
 	# az functionapp config container set \
 	# 	--image $(FULL_NEW_IMAGE_NAME) \
 	# 	--registry-password $(REGISTRY_PASSWORD) \
 	# 	--registry-username $(REGISTRY_USER) \
 	# 	--name $(APP_NAME) \
 	# 	--resource-group $(RESOURCE_GROUP)
-
-build_and_deploy: build deploy
 
 
 run-local:
@@ -64,3 +62,5 @@ stop-local:
 clean:
 	rm -rf $(OUT)
 	@echo "🧹 Cleaned output folder: $(OUT)"
+
+build_and_deploy: build deploy clean
