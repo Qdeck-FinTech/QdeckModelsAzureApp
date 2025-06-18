@@ -9,6 +9,12 @@
                 "host": "localhost",
                 "port": 9091
             },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/home/site/wwwroot"
+                }
+            ],
             "preLaunchTask": "func: host start"
         }
     ]

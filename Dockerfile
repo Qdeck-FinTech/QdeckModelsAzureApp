@@ -66,7 +66,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Set environment variables
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
-    FUNCTIONS_WORKER_RUNTIME=python 
+    FUNCTIONS_WORKER_RUNTIME=python \
+    PYTHONNET_RUNTIME=coreclr
 
 # ENV AzureWebJobsStorage=UseDevelopmentStorage=true \
 #     Storage=UseDevelopmentStorage=true \
