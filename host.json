@@ -8,11 +8,11 @@
     },
     "logLevel": {
       "Default": "Information",
-      "Host.Results": "Warning",
+      "Host.Results": "Information",
       "Function": "Information",
-      "Host.Aggregator": "Warning",
-      "Microsoft.Azure.WebJobs.Extensions.Storage": "Warning",
-      "Azure": "Warning"
+      "Host.Aggregator": "Information",
+      "Microsoft.Azure.WebJobs.Extensions.Storage": "Information",
+      "Azure": "Information"
     }
   },
   "extensionBundle": {
