@@ -19,7 +19,7 @@ WORKDIR /src
 COPY ./docker/mercury ./mercury
 
 # Publish to output path for runtime container
-RUN dotnet publish ./mercury -c Release -o /home/site/wwwroot/mercury
+RUN dotnet publish ./mercury -c Release -o /home/site/wwwroot/mercury --runtime linux-x64
 
 
 # ---- Runtime Stage ----
@@ -31,7 +31,19 @@ RUN apt-get update && \
     wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
-    apt-get install -y aspnetcore-runtime-8.0 && \
+    apt-get install -y \
+    dotnet-sdk-8.0 \
+    libkrb5-3 \
+    libicu-dev \
+    libssl-dev \
+    zlib1g \
+    curl \
+    unixodbc \
+    unixodbc-dev \
+    tdsodbc \
+    libcurl4-openssl-dev \
+    libpq5 && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy pre-built .NET app
@@ -60,9 +72,9 @@ COPY logger/ ./logger/
 # Core config and function entry point
 COPY function_app.py ./
 COPY host.json ./
-COPY local.settings.json ./
+# COPY local.settings.json ./
 COPY requirements.txt ./
-COPY .env ./
+
 
 # Install Python dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
@@ -73,11 +85,4 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     FUNCTIONS_WORKER_RUNTIME=python \
     PYTHONNET_RUNTIME=coreclr
 
-# ENV AzureWebJobsStorage=UseDevelopmentStorage=true \
-#     Storage=UseDevelopmentStorage=true \
-#     FUNCTIONS_WORKER_RUNTIME=python
-
-
-# # Default CMD
-# CMD ["python", "-m", "azure_functions_worker"]
 

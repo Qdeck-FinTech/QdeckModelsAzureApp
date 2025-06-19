@@ -8,14 +8,13 @@ import inspect
 import time
 import json
 
+
 from pythonnet import load, set_runtime
 
-# Tell pythonnet to use Mono
 set_runtime("coreclr")
+load("coreclr")
 
 import clr
-
-load("coreclr")
 
 # add the path to the Mercury bin directory
 root_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -24,10 +23,10 @@ sys.path.insert(0, bin_dir)
 
 clr.AddReference("Mercury")
 
-from Mercury import MercuryRunner, PythonLoggerAdapter
+from Mercury import MercuryRunner
 
 from logger.net_logger import net_logger
-from configuration.configuration import runner_config
+from configuration.configuration import QdeckModelRunnerConfiguration
 
 from AlphaVee.MercurySystem import AVModelRunner
 from MasterSystemLive.MercurySystem import MLModelRunner
@@ -61,6 +60,10 @@ class QdeckModelRunner(MercuryRunner):
     def get_system_runner(self, model_run_details=None):
         runner = None
 
+        runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
+        print(f"run_model() mercury config: {runner_config}")
+
         if model_run_details is not None:
             mod = model_run_details["folder"]
             match mod:
@@ -77,7 +80,7 @@ class QdeckModelRunner(MercuryRunner):
                 case "DirectIndexing":
                     runner = DirectIndexingModelRunner(net_logger, runner_config)
                 case _:
-                    logging.info("Unknown runner" + mod)
+                    logging.info("Unknown runner" + str(mod))
 
         return runner
 
@@ -154,6 +157,8 @@ def qdeck_model_orchestrator(context):
     tasks = []
     results = []
 
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
     if function_name == "run_model":
         task = context.call_activity(
             "run_model", {"model_id": model_id, "live": live, "config": config}
@@ -209,9 +214,13 @@ def run_model(context):
     live = context.get("live", False)
     config = context.get("config", "")
 
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
     logging.info(f"run_model(): {model_id} {live} {config}")
 
     logging.info(f"run_model() mercury config: {runner_config}")
+
+    print(f"run_model() mercury config: {runner_config}")
 
     run_id = 0
 

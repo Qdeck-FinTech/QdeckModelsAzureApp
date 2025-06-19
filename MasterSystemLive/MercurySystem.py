@@ -25,7 +25,7 @@ from Mercury import (
     TickerInfo,
 )  # type: ignore
 from logger.net_logger import net_logger
-from configuration.configuration import runner_config
+from configuration.configuration import QdeckModelRunnerConfiguration
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -932,6 +932,7 @@ def f_pnl_by_symbol(runner=None):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
     mlModelRunner = MLModelRunner(net_logger, runner_config)
 
     runId = mlModelRunner.run_model(model_id, update_qdeck, live, config)

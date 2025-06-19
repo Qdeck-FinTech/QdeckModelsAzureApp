@@ -18,7 +18,7 @@ from System.Collections.Generic import List  # type: ignore
 clr.AddReference("Mercury")
 from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
 from logger.net_logger import net_logger
-from configuration.configuration import runner_config
+from configuration.configuration import QdeckModelRunnerConfiguration
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -368,6 +368,8 @@ class AVModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
     avModelRunner = AVModelRunner(net_logger, runner_config)
 
     runId = avModelRunner.run_model(model_id, update_qdeck, live, config)

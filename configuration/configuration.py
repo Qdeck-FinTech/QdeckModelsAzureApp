@@ -1,10 +1,5 @@
 import json
 import configargparse
-from dotenv import dotenv_values
-
-import clr
-from System import String  # type: ignore
-from System.Collections.Generic import Dictionary  # type: ignore
 
 
 def dot_notation_to_nested_dict(flat_dict):
@@ -26,7 +21,7 @@ def dot_notation_to_nested_dict(flat_dict):
     return nested_dict
 
 
-def flatten_dict(d, parent_key='', sep=':'):
+def flatten_dict(d, parent_key="", sep=":"):
     items = {}
     for k, v in d.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -36,22 +31,9 @@ def flatten_dict(d, parent_key='', sep=':'):
             items[new_key] = str(v)
     return items
 
-def create_dotnet_config_dic(config_dict):
-    # Convert Python dict to .NET Dictionary<string, string>
-    net_dict = Dictionary[String, String]()
-    for k, v in config_dict.items():
-        net_dict[k] = v
-
-    return net_dict
-
 
 class QdeckModelRunnerConfiguration:
-    def __init__(self, env_path: str = ".env"):
-        # Step 1: Load and convert .env into nested dict
-        self.flat_env = dotenv_values(env_path)
-        self.nested_env = dot_notation_to_nested_dict(self.flat_env)
-
-        # Step 2: Create parser and bind all .env keys
+    def __init__(self):
         self.parser = configargparse.ArgParser()
 
         # Use is_config_file for optional external config file support
@@ -184,17 +166,17 @@ class QdeckModelRunnerConfiguration:
     def get_args(self):
         return self.parser.parse_args()
 
-    def get_nested_config(self):
-        return self.nested_env
-
     def get_config(self):
         config, _ = self.parser.parse_known_args()
         return config
 
+    def get_nested_config(self):
+        config = self.get_config()
+        flat_config = {k: v for k, v in vars(config).items() if v is not None}
+
+        nested_env = dot_notation_to_nested_dict(flat_config)
+        return nested_env
+
     def get_net_config(self):
-        return json.dumps(self.nested_env)
-
-
-
-env_config = QdeckModelRunnerConfiguration()
-runner_config = env_config.get_net_config()
+        nested_env = self.get_nested_config()
+        return json.dumps(nested_env)

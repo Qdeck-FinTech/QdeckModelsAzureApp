@@ -9,9 +9,7 @@ py_logger.setLevel(logging.DEBUG)
 
 class PythonLogger:
     def Log(self, level, msg):
-        py_logger.log(
-            logging.DEBUG, msg
-        )  # .NET LogLevel -> Python logging levels (approx)
+        py_logger.log(logging.INFO, msg)
 
 
 net_logger = PythonLoggerAdapter(PythonLogger())
