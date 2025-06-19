@@ -137,9 +137,9 @@ __azurite_db*__.json
 mercury/logs/
 mercury/output/
 
+docker
 AzuriteConfig
 
 .DS_Store
 
 
-docker

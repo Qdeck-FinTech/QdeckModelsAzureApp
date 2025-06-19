@@ -17,7 +17,8 @@ from System.Collections.Generic import List  # type: ignore
 
 clr.AddReference("Mercury")
 from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
-
+from net_logger import net_logger
+from configuration import runner_config
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -272,9 +273,6 @@ class KeebeckMultiStrategyConfig(MercuryRunConfig):
 class KeebeckMultiStrategyModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
-    def __init__(self):
-        super().__init__()
-
     def load_model_config(self, modelId):
         cfg_json = None
 
@@ -392,7 +390,7 @@ def f_pnl_by_symbol(runner=None):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
-    kmsModelRunner = KeebeckMultiStrategyModelRunner()
+    kmsModelRunner = KeebeckMultiStrategyModelRunner(net_logger, runner_config)
 
     runId = kmsModelRunner.run_model(model_id, update_qdeck, live, config)
 

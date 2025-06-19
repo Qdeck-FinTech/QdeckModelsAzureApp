@@ -8,8 +8,11 @@ import inspect
 import time
 import json
 
+from pythonnet import load, set_runtime
+# Tell pythonnet to use Mono
+set_runtime("coreclr")
+
 import clr
-from pythonnet import load
 
 load("coreclr")
 
@@ -20,9 +23,11 @@ sys.path.insert(0, bin_dir)
 
 clr.AddReference("Mercury")
 
-from Mercury import MercuryRunner
 
-# from AdaptiveMomentum.MercurySystem import AdaptiveMomentumModelRunner
+from Mercury import MercuryRunner
+from net_logger import net_logger
+from configuration import runner_config
+
 from AlphaVee.MercurySystem import AVModelRunner
 from MasterSystemLive.MercurySystem import MLModelRunner
 from NasdaqDorseyWright.MercurySystem import NDWModelRunner
@@ -34,8 +39,12 @@ from DirectIndexing.MercurySystem import DirectIndexingModelRunner
 class QdeckModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
-    def __init__(self):
-        super().__init__()
+    # def __init__(self):
+    #     super().__init__()
+
+    # def __init__(self, logger=None, configJsonString=None):
+    #     logging.info("Initializing QdeckModelRunner...", configJsonString)
+    #     super().__init__(logger, configJsonString)
 
     def get_model_details(self, model_id):
         model_run_details = None
@@ -55,17 +64,17 @@ class QdeckModelRunner(MercuryRunner):
             mod = model_run_details["folder"]
             match mod:
                 case "AlphaVee":
-                    runner = AVModelRunner()
+                    runner = AVModelRunner(net_logger, runner_config)
                 case "MasterSystemLive":
-                    runner = MLModelRunner()
+                    runner = MLModelRunner(net_logger, runner_config)
                 case "NasdaqDorseyWright":
-                    runner = NDWModelRunner()
+                    runner = NDWModelRunner(net_logger, runner_config)
                 case "PassiveIndex":
-                    runner = PassiveIndexModelRunner()
+                    runner = PassiveIndexModelRunner(net_logger, runner_config)
                 case "KeebeckMultiStrategy":
-                    runner = KeebeckMultiStrategyModelRunner()
+                    runner = KeebeckMultiStrategyModelRunner(net_logger, runner_config)
                 case "DirectIndexing":
-                    runner = DirectIndexingModelRunner()
+                    runner = DirectIndexingModelRunner(net_logger, runner_config)
                 case _:
                     print("Unknown runner" + mod)
 
@@ -82,12 +91,12 @@ class QdeckModelRunner(MercuryRunner):
 
         if model_runner is not None:
             # run model
-            print("Running model: ", str(model_id) + " ...")
+            logging.info("Running model: ", str(model_id) + " ...")
             runId = model_runner.run_model(model_id, update_qdeck, live, config)
 
-            print("Model ", str(model_id), " run completed!")
+            logging.info("Model ", str(model_id), " run completed!")
         else:
-            print("No model ", str(model_id), " run. No model details loaded.")
+            logging.info("No model ", str(model_id), " run. No model details loaded.")
 
         model_runner = None
 
@@ -139,7 +148,7 @@ def qdeck_model_orchestrator(context):
         raise Exception("Invalid model_id provided in input.")
 
     live = payload.get("live", False)
-    config = payload.get("config", "")
+    config = payload.get("config", False)
 
     tasks = []
     results = []
@@ -154,8 +163,11 @@ def qdeck_model_orchestrator(context):
         results = yield context.task_all(tasks)
 
     elif function_name == "run_all_models":
+        
+        logging.info(f"qdeck_model_orchestrator() run_all_models mercury config: {runner_config}")        
+        
         # init model runner
-        runner = QdeckModelRunner()
+        runner = QdeckModelRunner(net_logger, runner_config)
 
         # Ggt the scheduled model IDs
         model_ids = runner.get_scheduled_model_ids()
@@ -197,10 +209,14 @@ def run_model(context):
 
     logging.info(f"run_model(): {model_id} {live} {config}")
 
+    logging.info(f"run_model() mercury config: {runner_config}")
+
     run_id = 0
 
     if model_id > 0:
-        modelRunner = QdeckModelRunner()
+        modelRunner = QdeckModelRunner(net_logger, runner_config)
         run_id = modelRunner.run_model(model_id, False, live, config)
 
     return {"model_id": model_id, "run_id": run_id}
+
+

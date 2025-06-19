@@ -18,7 +18,8 @@ from System.Collections.Generic import List  # type: ignore
 
 clr.AddReference("Mercury")
 from Mercury import MercuryRunner, MercuryRunConfig, IMercurySystem, TickerInfo  # type: ignore
-
+from net_logger import net_logger
+from configuration import runner_config
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (
@@ -300,9 +301,6 @@ class EquityFixedIncomePassiveConfig(MercuryRunConfig):
 class PassiveIndexModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
-    def __init__(self):
-        super().__init__()
-
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
         cfg_data = None
 
@@ -342,7 +340,7 @@ class PassiveIndexModelRunner(MercuryRunner):
 
 
 def main(model_id=0, update_qdeck=0, live=0, config=None):
-    piModelRunner = PassiveIndexModelRunner()
+    piModelRunner = PassiveIndexModelRunner(net_logger, runner_config)
 
     runId = piModelRunner.run_model(model_id, update_qdeck, live, config)
 
