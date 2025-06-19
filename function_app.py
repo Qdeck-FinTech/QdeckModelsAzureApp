@@ -25,6 +25,9 @@ clr.AddReference("Mercury")
 
 from Mercury import MercuryRunner
 
+from System.Collections.Generic import List
+from System import Int32
+
 from logger.net_logger import net_logger
 from configuration.configuration import QdeckModelRunnerConfiguration
 
@@ -38,13 +41,6 @@ from DirectIndexing.MercurySystem import DirectIndexingModelRunner
 
 class QdeckModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
-
-    # def __init__(self):
-    #     super().__init__()
-
-    # def __init__(self, logger=None, configJsonString=None):
-    #     logging.info("Initializing QdeckModelRunner...", configJsonString)
-    #     super().__init__(logger, configJsonString)
 
     def get_model_details(self, model_id):
         model_run_details = None
@@ -61,8 +57,6 @@ class QdeckModelRunner(MercuryRunner):
         runner = None
 
         runner_config = QdeckModelRunnerConfiguration().get_net_config()
-
-        print(f"run_model() mercury config: {runner_config}")
 
         if model_run_details is not None:
             mod = model_run_details["folder"]
@@ -157,8 +151,6 @@ def qdeck_model_orchestrator(context):
     tasks = []
     results = []
 
-    runner_config = QdeckModelRunnerConfiguration().get_net_config()
-
     if function_name == "run_model":
         task = context.call_activity(
             "run_model", {"model_id": model_id, "live": live, "config": config}
@@ -169,40 +161,33 @@ def qdeck_model_orchestrator(context):
         results = yield context.task_all(tasks)
 
     elif function_name == "run_all_models":
-        logging.info(
-            f"qdeck_model_orchestrator() run_all_models mercury config: {runner_config}"
-        )
+        logging.info("qdeck_model_orchestrator() run_all_models")
 
-        # init model runner
-        runner = QdeckModelRunner(net_logger, runner_config)
-
-        # Ggt the scheduled model IDs
-        model_ids = runner.get_scheduled_model_ids()
+        # Step 1: Call an activity to fetch model IDs
+        model_ids = yield context.call_activity("get_scheduled_model_ids")
 
         if len(model_ids) > 0:
-            # init run_all notification service
-            runner.init_run_all(model_ids)
+            # Step 2: Init run-all notification (activity)
+            yield context.call_activity("init_run_all", model_ids)
 
-            for model_id in model_ids:
-                task = context.call_activity(
-                    "run_model", {"model_id": model_id, "live": True, "config": config}
+            # Step 3: Fan-out model runs
+            tasks = [
+                context.call_activity(
+                    "run_model", {"model_id": mid, "live": True, "config": config}
                 )
-                tasks.append(task)
-
-            # wait for all tasks to complete
+                for mid in model_ids
+            ]
             results = yield context.task_all(tasks)
 
-            # update status for each model
-            for result in results:
-                model_id = result.get("model_id", 0)
-                run_id = result.get("run_id", 0)
+            # Step 4: Update statuses in parallel
+            update_tasks = [
+                context.call_activity("update_model_status", result)
+                for result in results
+            ]
+            yield context.task_all(update_tasks)
 
-                logging.info(f"Updating model run complete: {model_id}, {run_id}")
-                # Update the model run status in the notification service
-                runner.update_model_run_complete(model_id, run_id)
-
-            # complete run_all notification service
-            runner.complete_run_all()
+            # Step 5: Complete notification (activity)
+            yield context.call_activity("complete_run_all", model_ids)
 
     return results
 
@@ -218,10 +203,6 @@ def run_model(context):
 
     logging.info(f"run_model(): {model_id} {live} {config}")
 
-    logging.info(f"run_model() mercury config: {runner_config}")
-
-    print(f"run_model() mercury config: {runner_config}")
-
     run_id = 0
 
     if model_id > 0:
@@ -229,3 +210,51 @@ def run_model(context):
         run_id = modelRunner.run_model(model_id, False, live, config)
 
     return {"model_id": model_id, "run_id": run_id}
+
+
+@myApp.activity_trigger(input_name="input")
+def get_scheduled_model_ids(input):
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
+    runner = QdeckModelRunner(net_logger, runner_config)
+    ids = runner.get_scheduled_model_ids()
+
+    return list(ids)  # Ensure we return a list of model IDs
+
+
+@myApp.activity_trigger(input_name="model_ids")
+def init_run_all(model_ids):
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
+    runner = QdeckModelRunner(net_logger, runner_config)
+
+    dotnet_model_ids = List[Int32]()
+    for item in model_ids:
+        dotnet_model_ids.Add(Int32(item))
+
+    runner.init_run_all(dotnet_model_ids)
+
+    return {"status": "Run all initialized", "model_ids": model_ids}
+
+
+@myApp.activity_trigger(input_name="result")
+def update_model_status(result):
+    model_id = result.get("model_id")
+    run_id = result.get("run_id")
+
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
+    runner = QdeckModelRunner(net_logger, runner_config)
+    runner.update_model_run_complete(model_id, run_id)
+
+    return {"model_id": model_id, "run_id": run_id, "status": "Updated"}
+
+
+@myApp.activity_trigger(input_name="model_ids")
+def complete_run_all(model_ids):
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+
+    runner = QdeckModelRunner(net_logger, runner_config)
+    runner.complete_run_all()
+
+    return {"status": "Run all completed", "model_ids": model_ids}
