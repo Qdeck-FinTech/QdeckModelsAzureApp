@@ -5,7 +5,7 @@ import configargparse
 def dot_notation_to_nested_dict(flat_dict):
     nested_dict = {}
     for key, value in flat_dict.items():
-        parts = key.split(".")
+        parts = key.split("_")
         d = nested_dict
         for part in parts[:-1]:
             d = d.setdefault(part, {})
@@ -48,118 +48,118 @@ class QdeckModelRunnerConfiguration:
 
         # Register arguments for all known .env fields
         self.parser.add_argument(
-            "--SQLSettings.refinitivDataSQL",
-            env_var="SQLSettings.refinitivDataSQL",
+            "--SQLSettings_refinitivDataSQL",
+            env_var="SQLSettings_refinitivDataSQL",
             type=str,
         )
         self.parser.add_argument(
-            "--SQLSettings.qdeckSqlConnectionString",
-            env_var="SQLSettings.qdeckSqlConnectionString",
+            "--SQLSettings_qdeckSqlConnectionString",
+            env_var="SQLSettings_qdeckSqlConnectionString",
             type=str,
         )
         self.parser.add_argument(
-            "--SQLSettings.qdeckPostgresConnectionString",
-            env_var="SQLSettings.qdeckPostgresConnectionString",
+            "--SQLSettings_qdeckPostgresConnectionString",
+            env_var="SQLSettings_qdeckPostgresConnectionString",
             type=str,
         )
         self.parser.add_argument(
-            "--SQLSettings.usePostgres", env_var="SQLSettings.usePostgres", type=str
+            "--SQLSettings_usePostgres", env_var="SQLSettings_usePostgres", type=str
         )
 
         self.parser.add_argument(
-            "--StatusNotificationSettings.topic",
-            env_var="StatusNotificationSettings.topic",
+            "--StatusNotificationSettings_topic",
+            env_var="StatusNotificationSettings_topic",
             type=str,
         )
         self.parser.add_argument(
-            "--StatusNotificationSettings.address",
-            env_var="StatusNotificationSettings.address",
+            "--StatusNotificationSettings_address",
+            env_var="StatusNotificationSettings_address",
             type=str,
         )
         self.parser.add_argument(
-            "--StatusNotificationSettings.port",
-            env_var="StatusNotificationSettings.port",
+            "--StatusNotificationSettings_port",
+            env_var="StatusNotificationSettings_port",
             type=int,
         )
 
         self.parser.add_argument(
-            "--LiveRunSettings.externalModelBaseModelID",
-            env_var="LiveRunSettings.externalModelBaseModelID",
+            "--LiveRunSettings_externalModelBaseModelID",
+            env_var="LiveRunSettings_externalModelBaseModelID",
             type=int,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.liveSocketPortStart",
-            env_var="LiveRunSettings.liveSocketPortStart",
+            "--LiveRunSettings_liveSocketPortStart",
+            env_var="LiveRunSettings_liveSocketPortStart",
             type=int,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckLoginAddress",
-            env_var="LiveRunSettings.qdeckLoginAddress",
+            "--LiveRunSettings_qdeckLoginAddress",
+            env_var="LiveRunSettings_qdeckLoginAddress",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckLoginUser",
-            env_var="LiveRunSettings.qdeckLoginUser",
+            "--LiveRunSettings_qdeckLoginUser",
+            env_var="LiveRunSettings_qdeckLoginUser",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckLoginPass",
-            env_var="LiveRunSettings.qdeckLoginPass",
+            "--LiveRunSettings_qdeckLoginPass",
+            env_var="LiveRunSettings_qdeckLoginPass",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckLoginGuid",
-            env_var="LiveRunSettings.qdeckLoginGuid",
+            "--LiveRunSettings_qdeckLoginGuid",
+            env_var="LiveRunSettings_qdeckLoginGuid",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckResultsAddress",
-            env_var="LiveRunSettings.qdeckResultsAddress",
+            "--LiveRunSettings_qdeckResultsAddress",
+            env_var="LiveRunSettings_qdeckResultsAddress",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckProductionFolderRoot",
-            env_var="LiveRunSettings.qdeckProductionFolderRoot",
+            "--LiveRunSettings_qdeckProductionFolderRoot",
+            env_var="LiveRunSettings_qdeckProductionFolderRoot",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckOutputFolderRoot",
-            env_var="LiveRunSettings.qdeckOutputFolderRoot",
+            "--LiveRunSettings_qdeckOutputFolderRoot",
+            env_var="LiveRunSettings_qdeckOutputFolderRoot",
             type=str,
         )
         self.parser.add_argument(
-            "--LiveRunSettings.qdeckOutputFolderFormat",
-            env_var="LiveRunSettings.qdeckOutputFolderFormat",
+            "--LiveRunSettings_qdeckOutputFolderFormat",
+            env_var="LiveRunSettings_qdeckOutputFolderFormat",
             type=str,
         )
 
         self.parser.add_argument(
-            "--ScheduledRunSettings.sendEmail",
-            env_var="ScheduledRunSettings.sendEmail",
+            "--ScheduledRunSettings_sendEmail",
+            env_var="ScheduledRunSettings_sendEmail",
             type=str,
         )
         self.parser.add_argument(
-            "--ScheduledRunSettings.server",
-            env_var="ScheduledRunSettings.server",
+            "--ScheduledRunSettings_server",
+            env_var="ScheduledRunSettings_server",
             type=str,
         )
         self.parser.add_argument(
-            "--ScheduledRunSettings.port", env_var="ScheduledRunSettings.port", type=int
+            "--ScheduledRunSettings_port", env_var="ScheduledRunSettings_port", type=int
         )
         self.parser.add_argument(
-            "--ScheduledRunSettings.from", env_var="ScheduledRunSettings.from", type=str
+            "--ScheduledRunSettings_from", env_var="ScheduledRunSettings_from", type=str
         )
         self.parser.add_argument(
-            "--ScheduledRunSettings.to", env_var="ScheduledRunSettings.to", type=str
+            "--ScheduledRunSettings_to", env_var="ScheduledRunSettings_to", type=str
         )
         self.parser.add_argument(
-            "--ScheduledRunSettings.username",
-            env_var="ScheduledRunSettings.username",
+            "--ScheduledRunSettings_username",
+            env_var="ScheduledRunSettings_username",
             type=str,
         )
         self.parser.add_argument(
-            "--ScheduledRunSettings.password",
-            env_var="ScheduledRunSettings.password",
+            "--ScheduledRunSettings_password",
+            env_var="ScheduledRunSettings_password",
             type=str,
         )
 
