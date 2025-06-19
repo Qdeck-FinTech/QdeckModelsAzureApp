@@ -23,10 +23,10 @@ sys.path.insert(0, bin_dir)
 
 clr.AddReference("Mercury")
 
+from Mercury import MercuryRunner, PythonLoggerAdapter
 
-from Mercury import MercuryRunner
-from net_logger import net_logger
-from configuration import runner_config
+from logger.net_logger import net_logger
+from configuration.configuration import runner_config
 
 from AlphaVee.MercurySystem import AVModelRunner
 from MasterSystemLive.MercurySystem import MLModelRunner

@@ -57,7 +57,7 @@ list_local_images:
 
 deploy: confirm_tag
 	@echo "Deploying image to Azure Container Registry..."
-	# az acr login --name $(REGISTRY)
+	az acr login --name $(REGISTRY)
 	docker push $(FULL_NEW_IMAGE_NAME)
 	# az acr update -n $(REGISTRY) --admin-enabled true
 	# az functionapp config container set \

@@ -23,8 +23,8 @@ from Mercury import (
     PriceField,
     TickerInfo,
 )  # type: ignore
-from net_logger import net_logger
-from configuration import runner_config
+from logger.net_logger import net_logger
+from configuration.configuration import runner_config
 
 from utils.np_interop import to_numpy
 from stats.MercuryStats import (

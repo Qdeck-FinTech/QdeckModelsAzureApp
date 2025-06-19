@@ -54,11 +54,15 @@ COPY PassiveIndex/ ./PassiveIndex/
 COPY utils/ ./utils/
 COPY stats/ ./stats/
 
+COPY configuration/ ./configuration/
+COPY logger/ ./logger/
+
 # Core config and function entry point
 COPY function_app.py ./
 COPY host.json ./
 COPY local.settings.json ./
 COPY requirements.txt ./
+COPY .env ./
 
 # Install Python dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
