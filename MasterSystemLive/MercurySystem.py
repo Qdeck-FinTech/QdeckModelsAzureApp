@@ -4,6 +4,7 @@ import datetime
 import ta
 import json
 import os, sys, inspect
+import logging
 
 current_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 code_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -592,7 +593,7 @@ class MasterSystemLive(IMercurySystem):
                     )
 
     def run(self):
-        # print(self.current_date.ToString())
+        # logging.info(self.current_date.ToString())
 
         self.update_rebalance_date()
 
@@ -612,7 +613,7 @@ class MasterSystemLive(IMercurySystem):
                 )
 
         if self.rebalance:
-            # print("rebalance: " + self.current_date.ToString())
+            # logging.info("rebalance: " + self.current_date.ToString())
 
             close = self.contextHolder.market_data_loader.get_price_field(
                 PriceField.Close
@@ -867,7 +868,7 @@ class MLModelRunner(MercuryRunner):
         # run simulation
         runId = self.run(run_config)
 
-        print("completed! run id: " + str(runId))
+        logging.info("completed! run id: " + str(runId))
 
         return runId
 

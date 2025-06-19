@@ -4,6 +4,7 @@ import datetime
 import ta
 import json
 import os, sys, inspect
+import logging
 
 code_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 project_dir = os.path.dirname(code_dir)
@@ -158,7 +159,7 @@ class DirectIndexingSystem(IMercurySystem):
 
     def run_open(self):
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
-        # print("run_open: ", current_date_s)
+        # logging.info("run_open: "+ current_date_s)
 
         current_date_weights = (
             self.contextHolder.model_data_repository.current_date_weights
@@ -167,7 +168,7 @@ class DirectIndexingSystem(IMercurySystem):
         current_date_weights = {k: v.weight for k, v in current_date_weights.items()}
 
         if len(current_date_weights) == 0:
-            print("run_open - no weights available: ", current_date_s)
+            logging.info("run_open - no weights available: " + current_date_s)
             return
 
         trade = self.is_rebalance_date()
@@ -175,7 +176,7 @@ class DirectIndexingSystem(IMercurySystem):
         today = DateTime.Today
 
         if trade:
-            print("Rebalance: ", self.current_date.ToString("yyyy-MM-dd"))
+            logging.info("Rebalance: " + self.current_date.ToString("yyyy-MM-dd"))
 
             current_date_weights = self.Calculate_weights_reduced_number_of_symbols(
                 current_date_weights
@@ -193,7 +194,7 @@ class DirectIndexingSystem(IMercurySystem):
             current_date_weights = {}
 
         # if self.current_date.ToString("yyyy-MM-dd") == "2025-01-01":
-        #     print(self.current_date.ToString("yyyy-MM-dd"))
+        #     logging.info(self.current_date.ToString("yyyy-MM-dd"))
 
         pos_by_symbol = {}
         if self.name in self.contextHolder.oms.position_by_system_and_symbol.keys():
@@ -264,7 +265,7 @@ class DirectIndexingSystem(IMercurySystem):
                     # prev weight exit
                     if len(pos_by_symbol) > 0:
                         for ps in pos_by_symbol.keys():
-                            # print(current_date_weights[ps].weight)
+                            # logging.info(current_date_weights[ps].weight)
 
                             if pos_by_symbol[ps] != 0 and (
                                 ps not in current_date_weights.keys()
@@ -275,7 +276,7 @@ class DirectIndexingSystem(IMercurySystem):
 
                     # new weight entry
 
-                    print(len(current_date_weights))
+                    logging.info(len(current_date_weights))
                     for symbol in current_date_weights.keys():
                         if (
                             symbol not in symbols_to_exit
@@ -383,7 +384,7 @@ class DirectIndexingConfig(MercuryRunConfig):
 
         # overwrite from cfg
         if cfg is not None:
-            print(cfg["parameters"])
+            # print(cfg["parameters"])
 
             start_date = pd.to_datetime(cfg["parameters"]["Start_Date"])
             initial_equity = float(cfg["parameters"]["Initial_Equity"])
@@ -458,7 +459,7 @@ class DirectIndexingModelRunner(MercuryRunner):
 
         runId = self.run(run_config)
 
-        print("completed! run id: " + str(runId))
+        logging.info("completed! run id: " + str(runId))
 
         return runId
 

@@ -6,6 +6,7 @@ import json
 import os, sys, inspect
 import itertools
 from collections import deque, defaultdict
+import logging
 
 code_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 project_dir = os.path.dirname(code_dir)
@@ -114,11 +115,11 @@ class NDWStopLossSystem(IMercurySystem):
     # endregion
 
     def order_filled(self, order):
-        print(
-            "order_filled: ",
-            order.ticker.ToString(),
-            order.fill_date.ToString("yyyy-MM-dd"),
-            order.quantity,
+        logging.info(
+            "order_filled: "
+            + order.ticker.ToString()
+            + order.fill_date.ToString("yyyy-MM-dd")
+            + str(order.quantity),
         )
 
         # store the latest date for the fill
@@ -157,12 +158,12 @@ class NDWStopLossSystem(IMercurySystem):
         # calc price change
         percent_change = (current_price / entry_price) - 1
 
-        # print(
-        #     "eval_stop_loss: ",
-        #     self.current_date.ToString("yyyy-MM-dd"),
-        #     order_bar.trade_date.ToString("yyyy-MM-dd"),
-        #     symbol,
-        #     percent_change,
+        # logging.info(
+        #     "eval_stop_loss: " +
+        #     self.current_date.ToString("yyyy-MM-dd") +
+        #     order_bar.trade_date.ToString("yyyy-MM-dd") +
+        #     symbol +
+        #     str(percent_change),
         # )
 
         # if threshold is breached using config stop_loss_percent
@@ -180,14 +181,14 @@ class NDWStopLossSystem(IMercurySystem):
 
     def run_open(self):
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
-        # print("run_open: ", current_date_s)
+        # logging.info("run_open: " + current_date_s)
 
         current_date_weights = (
             self.contextHolder.model_data_repository.current_date_weights
         )
 
         if len(current_date_weights) == 0:
-            print("run_open - no weights available: ", current_date_s)
+            logging.info("run_open - no weights available: " + current_date_s)
             return
 
         trade = False
@@ -199,7 +200,7 @@ class NDWStopLossSystem(IMercurySystem):
         today = DateTime.Today
 
         # if current_date_s == "2025-03-11":
-        #     print(current_date_s)
+        #     logging.info(current_date_s)
 
         if self.previous_month == None:
             self.previous_month = self.current_date.Month
@@ -308,7 +309,7 @@ class NDWStopLossSystem(IMercurySystem):
                         # update the latest stop-loss date
                         self.stop_loss_date = self.current_date
 
-                        print("stop loss: ", ps, current_date_s)
+                        logging.info("stop loss: " + ps + current_date_s)
 
         if trade:
             # reset active stop-loss tracking
@@ -491,7 +492,7 @@ class NDWStopLossRunner(MercuryRunner):
 
         runId = self.run(run_config)
 
-        print("completed! run id: " + str(runId))
+        logging.info("completed! run id: " + str(runId))
 
         return runId, run_config
 

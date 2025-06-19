@@ -6,6 +6,7 @@ import json
 import os, sys, inspect
 import itertools
 from collections import deque, defaultdict
+import logging
 
 code_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 project_dir = os.path.dirname(code_dir)
@@ -146,7 +147,7 @@ class PassiveExposure(IMercurySystem):
 
     def run(self):
         if self.current_date >= self.next_rebal_date:
-            print("rebalance:" + str(self.next_rebal_date))
+            logging.info("rebalance:" + str(self.next_rebal_date))
             self.update_rebalance_date()
             self.set_position_by_weight(self.cfg.symbols, self.cfg.weights)
 
@@ -334,7 +335,7 @@ class PassiveIndexModelRunner(MercuryRunner):
         # run simulation
         runId = self.run(run_config)
 
-        print("completed! run id: " + str(runId))
+        logging.info("completed! run id: " + str(runId))
 
         return runId
 

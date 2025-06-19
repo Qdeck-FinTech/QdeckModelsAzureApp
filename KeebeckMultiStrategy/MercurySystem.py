@@ -4,6 +4,7 @@ import datetime
 import ta
 import json
 import os, sys, inspect
+import logging
 
 current_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 code_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -133,7 +134,7 @@ class KeebeckMultiStrategy(IMercurySystem):
         self.update_rebalance_date()
 
         if self.rebalance:
-            print("Rebalance: ", self.current_date.ToString())
+            logging.info("Rebalance: " + self.current_date.ToString())
 
             for symbol, weight in self.symbols_weights_d.items():
                 if weight > 0:
@@ -324,9 +325,9 @@ class KeebeckMultiStrategyModelRunner(MercuryRunner):
             # run simulation
             runId = self.run(run_config)
 
-            print("completed! run id: ", runId)
+            logging.info("completed! run id: " + str(runId))
         else:
-            print("fail to load configuration file! model_id: ", model_id)
+            logging.info("fail to load configuration file! model_id: " + str(model_id))
 
         return runId
 

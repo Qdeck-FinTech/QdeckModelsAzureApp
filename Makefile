@@ -68,7 +68,7 @@ deploy: confirm_tag
 	# 	--resource-group $(RESOURCE_GROUP)
 
 
-run-local:
+run-local: confirm_tag prepare_dotnet
 	@echo "Running local Azure Function + Azurite using Docker Compose..."
 	docker-compose up --build
 

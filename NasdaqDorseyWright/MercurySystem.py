@@ -4,6 +4,7 @@ import datetime
 import ta
 import json
 import os, sys, inspect
+import logging
 
 code_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 project_dir = os.path.dirname(code_dir)
@@ -114,14 +115,14 @@ class DorseyWrightWeightRebalanceSystem(IMercurySystem):
 
     def run_open(self):
         current_date_s = self.current_date.ToString("yyyy-MM-dd")
-        # print("run_open: ", current_date_s)
+        # logging.info("run_open: " + current_date_s)
 
         current_date_weights = (
             self.contextHolder.model_data_repository.current_date_weights
         )
 
         if len(current_date_weights) == 0:
-            print("run_open - no weights available: ", current_date_s)
+            logging.info("run_open - no weights available: " + current_date_s)
             return
 
         trade = False
@@ -129,7 +130,7 @@ class DorseyWrightWeightRebalanceSystem(IMercurySystem):
         today = DateTime.Today
 
         # if self.current_date.ToString("yyyy-MM-dd") == "2025-01-01":
-        #     print(self.current_date.ToString("yyyy-MM-dd"))
+        #     logging.info(self.current_date.ToString("yyyy-MM-dd"))
 
         pos_by_symbol = {}
         if self.name in self.contextHolder.oms.position_by_system_and_symbol.keys():
@@ -332,7 +333,6 @@ class NDWWeightRebalanceConfig(MercuryRunConfig):
 class NDWModelRunner(MercuryRunner):
     __namespace__ = "Mercury"
 
-
     def run_model(self, model_id=0, update_qdeck=0, live=0, config=None):
         cfg_data = None
 
@@ -381,7 +381,7 @@ class NDWModelRunner(MercuryRunner):
 
         runId = self.run(run_config)
 
-        print("completed! run id: " + str(runId))
+        logging.info("completed! run id: " + str(runId))
 
         return runId
 

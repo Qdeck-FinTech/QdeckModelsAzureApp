@@ -9,6 +9,7 @@ import time
 import json
 
 from pythonnet import load, set_runtime
+
 # Tell pythonnet to use Mono
 set_runtime("coreclr")
 
@@ -76,7 +77,7 @@ class QdeckModelRunner(MercuryRunner):
                 case "DirectIndexing":
                     runner = DirectIndexingModelRunner(net_logger, runner_config)
                 case _:
-                    print("Unknown runner" + mod)
+                    logging.info("Unknown runner" + mod)
 
         return runner
 
@@ -91,12 +92,12 @@ class QdeckModelRunner(MercuryRunner):
 
         if model_runner is not None:
             # run model
-            logging.info("Running model: ", str(model_id) + " ...")
+            logging.info("Running model: " + str(model_id) + " ...")
             runId = model_runner.run_model(model_id, update_qdeck, live, config)
 
-            logging.info("Model ", str(model_id), " run completed!")
+            logging.info("Model " + str(model_id) + " run completed!")
         else:
-            logging.info("No model ", str(model_id), " run. No model details loaded.")
+            logging.info("No model " + str(model_id) + " run. No model details loaded.")
 
         model_runner = None
 
@@ -163,9 +164,10 @@ def qdeck_model_orchestrator(context):
         results = yield context.task_all(tasks)
 
     elif function_name == "run_all_models":
-        
-        logging.info(f"qdeck_model_orchestrator() run_all_models mercury config: {runner_config}")        
-        
+        logging.info(
+            f"qdeck_model_orchestrator() run_all_models mercury config: {runner_config}"
+        )
+
         # init model runner
         runner = QdeckModelRunner(net_logger, runner_config)
 
@@ -218,5 +220,3 @@ def run_model(context):
         run_id = modelRunner.run_model(model_id, False, live, config)
 
     return {"model_id": model_id, "run_id": run_id}
-
-
