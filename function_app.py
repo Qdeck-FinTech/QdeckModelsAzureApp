@@ -136,29 +136,31 @@ def qdeck_model_orchestrator(context):
     input_data = context.get_input()
 
     function_name = input_data.get("functionName")
-    payload = input_data.get("data")
+    payload = input_data.get("data", {})
 
     logging.info(f"qdeck_model_orchestrator(): {function_name} {payload}")
-
-    model_id = payload.get("model_id", 0)
-
-    if model_id <= 0:
-        raise Exception("Invalid model_id provided in input.")
-
-    live = payload.get("live", False)
-    config = payload.get("config", False)
 
     tasks = []
     results = []
 
     if function_name == "run_model":
+        model_id = payload.get("model_id")
+
+        # If model_id is missing or not positive, skip execution
+        if not isinstance(model_id, int) or model_id <= 0:
+            logging.warning(f"Invalid or missing model_id: {model_id}")
+            return []
+
+        live = payload.get("live", False)
+        config = payload.get("config", None)
+
+        # Fan-out task
         task = context.call_activity(
             "run_model", {"model_id": model_id, "live": live, "config": config}
         )
-        tasks.append(task)
 
-        # wait for all tasks to complete
-        results = yield context.task_all(tasks)
+        # wait for tasks to complete
+        results = yield context.task_all([task])
 
     elif function_name == "run_all_models":
         logging.info("qdeck_model_orchestrator() run_all_models")
@@ -167,27 +169,19 @@ def qdeck_model_orchestrator(context):
         model_ids = yield context.call_activity("get_scheduled_model_ids")
 
         if len(model_ids) > 0:
-            # Step 2: Init run-all notification (activity)
-            yield context.call_activity("init_run_all", model_ids)
-
-            # Step 3: Fan-out model runs
+            # Step 2: Fan-out model runs
             tasks = [
                 context.call_activity(
-                    "run_model", {"model_id": mid, "live": True, "config": config}
+                    "run_model", {"model_id": mid, "live": True, "config": None}
                 )
                 for mid in model_ids
             ]
             results = yield context.task_all(tasks)
 
-            # Step 4: Update statuses in parallel
-            update_tasks = [
-                context.call_activity("update_model_status", result)
-                for result in results
-            ]
-            yield context.task_all(update_tasks)
-
-            # Step 5: Complete notification (activity)
-            yield context.call_activity("complete_run_all", model_ids)
+            # Step 3: Complete notification (activity)
+            yield context.call_activity(
+                "complete_run_all", {"model_ids": model_ids, "results": results}
+            )
 
     return results
 
@@ -222,39 +216,41 @@ def get_scheduled_model_ids(input):
     return list(ids)  # Ensure we return a list of model IDs
 
 
-@myApp.activity_trigger(input_name="model_ids")
-def init_run_all(model_ids):
+@myApp.activity_trigger(input_name="context")
+def complete_run_all(context):
+    model_ids = context.get("model_ids")
+    results = context.get("results")
+
+    # get runner config
     runner_config = QdeckModelRunnerConfiguration().get_net_config()
 
+    # create a new instance of the QdeckModelRunner
     runner = QdeckModelRunner(net_logger, runner_config)
 
+    # initialize the model list for the email
+    runner.get_scheduled_model_ids()
+
+    # initialize the list of model IDs for .NET
     dotnet_model_ids = List[Int32]()
     for item in model_ids:
         dotnet_model_ids.Add(Int32(item))
 
+    # initialize the run all process
     runner.init_run_all(dotnet_model_ids)
 
-    return {"status": "Run all initialized", "model_ids": model_ids}
+    # update status for each model run
+    for result in results:
+        model_id = result.get("model_id", 0)
+        run_id = result.get("run_id", 0)
 
+        if model_id > 0 and run_id > 0:
+            runner.update_model_run_complete(model_id, run_id)
 
-@myApp.activity_trigger(input_name="result")
-def update_model_status(result):
-    model_id = result.get("model_id")
-    run_id = result.get("run_id")
-
-    runner_config = QdeckModelRunnerConfiguration().get_net_config()
-
-    runner = QdeckModelRunner(net_logger, runner_config)
-    runner.update_model_run_complete(model_id, run_id)
-
-    return {"model_id": model_id, "run_id": run_id, "status": "Updated"}
-
-
-@myApp.activity_trigger(input_name="model_ids")
-def complete_run_all(model_ids):
-    runner_config = QdeckModelRunnerConfiguration().get_net_config()
-
-    runner = QdeckModelRunner(net_logger, runner_config)
+    # complete the run all process
     runner.complete_run_all()
 
-    return {"status": "Run all completed", "model_ids": model_ids}
+    return {
+        "status": "Completed",
+        "message": "Email notification sent.",
+        "model_ids": model_ids,
+    }
