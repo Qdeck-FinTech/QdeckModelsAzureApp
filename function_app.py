@@ -193,9 +193,9 @@ def run_model(context):
     live = context.get("live", False)
     config = context.get("config", "")
 
-    runner_config = QdeckModelRunnerConfiguration().get_net_config()
+    logging.info(f"run_model(): {model_id} {live} {config}...")
 
-    logging.info(f"run_model(): {model_id} {live} {config}")
+    runner_config = QdeckModelRunnerConfiguration().get_net_config()
 
     run_id = 0
 
@@ -208,6 +208,8 @@ def run_model(context):
 
 @myApp.activity_trigger(input_name="input")
 def get_scheduled_model_ids(input):
+    logging.info("get_scheduled_model_ids()...")
+
     runner_config = QdeckModelRunnerConfiguration().get_net_config()
 
     runner = QdeckModelRunner(net_logger, runner_config)
@@ -220,6 +222,8 @@ def get_scheduled_model_ids(input):
 def complete_run_all(context):
     model_ids = context.get("model_ids")
     results = context.get("results")
+
+    logging.info("complete_run_all() ...")
 
     # get runner config
     runner_config = QdeckModelRunnerConfiguration().get_net_config()
